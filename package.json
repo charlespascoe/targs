@@ -1,0 +1,27 @@
+{
+  "name": "targs",
+  "version": "0.0.1",
+  "description": "Strongly Typed Command-Line Argument Parsing",
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cpascoe95/targs.git"
+  },
+  "keywords": [
+    "typed",
+    "typescript",
+    "args",
+    "argument",
+    "parsing",
+    "interface"
+  ],
+  "author": "Charles Pascoe <charles@cpascoe.co.uk>",
+  "license": "LGPL-3.0",
+  "bugs": {
+    "url": "https://github.com/cpascoe95/targs/issues"
+  },
+  "homepage": "https://github.com/cpascoe95/targs#readme"
+}

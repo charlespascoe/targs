@@ -29,6 +29,8 @@
   },
   "homepage": "https://github.com/cpascoe95/targs#readme",
   "devDependencies": {
+    "@types/node": "8.0.57",
     "typescript": "2.6.2"
-  }
+  },
+  "dependencies": {}
 }

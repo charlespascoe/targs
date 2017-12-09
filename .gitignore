@@ -57,3 +57,8 @@ typings/
 # dotenv environment variables file
 .env
 
+# Ignore package-lock.json until it becomes more stable
+package-lock.json
+
+# Ignore dist
+/dist/

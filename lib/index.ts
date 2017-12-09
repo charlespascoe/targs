@@ -1,7 +1,9 @@
 import {
   Token,
   tokeniseArguments,
-  IArgumentToken
+  IArgumentToken,
+  shortOptionNameRegex,
+  longOptionNameRegex
 } from './tokens';
 export * from './tokens';
 
@@ -33,18 +35,16 @@ export abstract class Optional<T> extends Argument<T> {
     super();
 
     if (typeof options.short === 'string') {
-      if (!/^[a-z]$/i.test(options.short)) {
+      if (!shortOptionNameRegex.test(options.short)) {
         throw new Error(`Short flags and options must be a single character: '${options.short}' is not valid.`);
       }
 
       this.short = options.short;
     }
 
-    const longFlagRegex = /[a-z]+(-[a-z]+)*$/i;
-
     if (typeof options.long === 'string') {
-      if (!longFlagRegex.test(options.long)) {
-        throw new Error(`Long flags and options must match ${longFlagRegex}: '${options.long}' does not match.`);
+      if (!longOptionNameRegex.test(options.long)) {
+        throw new Error(`Long flags and options must match ${longOptionNameRegex}: '${options.long}' does not match.`);
       }
 
       this.long = options.long;

@@ -1,5 +1,5 @@
-export const shortOptionsRegex = /^-[a-z]+(=.*)?$/i;
-export const longOptionRegex = /^--[a-z]+(-[a-z]+)*(=.*)?$/i;
+export const shortOptionsRegex = /^-[a-z0-9]+(=.*)?$/i;
+export const longOptionRegex = /^--[a-z0-9]+(-[a-z0-9]+)*(=.*)?$/i;
 
 
 export interface IShortOptionToken {

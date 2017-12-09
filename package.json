@@ -1,9 +1,13 @@
 {
   "name": "targs",
   "version": "0.0.1",
-  "description": "Strongly Typed Command-Line Argument Parsing",
+  "description": "Strongly-Typed Command Line Argument Parsing",
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
+    "build": "rm -rf ./dist/ && tsc --pretty --outDir ./dist/ || exit 0",
+    "watch": "rm -rf ./dist/ && tsc --pretty -w --outDir ./dist/",
+    "clean": "rm -rf ./dist/",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -23,5 +27,8 @@
   "bugs": {
     "url": "https://github.com/cpascoe95/targs/issues"
   },
-  "homepage": "https://github.com/cpascoe95/targs#readme"
+  "homepage": "https://github.com/cpascoe95/targs#readme",
+  "devDependencies": {
+    "typescript": "2.6.2"
+  }
 }

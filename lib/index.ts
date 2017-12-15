@@ -252,32 +252,38 @@ export class PositionalArgument<T> extends Argument<T> {
 }
 
 
-export type ArgumentParser<T> = {
+export type ArgumentParserOptions<T> = {
   [K in keyof T]: Argument<T[K]>;
 };
 
 
-export function parseArgs<T>(args: string[], argParser: ArgumentParser<T>): T {
-  const result: any = {};
+export class ArgumentParser<T> {
+  constructor(
+    private parsers: ArgumentParserOptions<T>
+  ) {  }
 
-  let tokens = tokeniseArguments(args);
+  public parse(args: string[]): T {
+    const result: any = {};
 
-  // Process flags and optional arguments first
-  for (const key in argParser) {
-    if (argParser[key] instanceof Optional) {
-      const { newTokens, value } = argParser[key].evaluate(tokens);
-      result[key] = value;
-      tokens = newTokens;
+    let tokens = tokeniseArguments(args);
+
+    // Process flags and optional arguments first
+    for (const key in this.parsers) {
+      if (this.parsers[key] instanceof Optional) {
+        const { newTokens, value } = this.parsers[key].evaluate(tokens);
+        result[key] = value;
+        tokens = newTokens;
+      }
     }
-  }
 
-  for (const key in argParser) {
-    if (!(argParser[key] instanceof Optional)) {
-      const { newTokens, value } = argParser[key].evaluate(tokens);
-      result[key] = value;
-      tokens = newTokens;
+    for (const key in this.parsers) {
+      if (!(this.parsers[key] instanceof Optional)) {
+        const { newTokens, value } = this.parsers[key].evaluate(tokens);
+        result[key] = value;
+        tokens = newTokens;
+      }
     }
-  }
 
-  return result;
+    return result;
+  }
 }

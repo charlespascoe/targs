@@ -268,30 +268,43 @@ export class MultiOptionalArgument<T> extends Optional<T[]> {
 
 export interface IPositionalArgumentOptions<T> {
   description?: string;
-  default: T;
+  default?: T;
+  metaVar: string;
   parse: (val: string) => T;
 }
 
 
 export class PositionalArgument<T> extends Argument<T> {
-  public readonly default: T;
+  public readonly default: {value: T} | null = null;
 
-  private parse: (val: string) => T;
+  public get required() { return this.default === null; }
+
+  public readonly metaVar: string;
+
+  private readonly parse: (val: string) => T;
 
   constructor(options: IPositionalArgumentOptions<T>) {
     super();
 
-    this.default = options.default;
+    if (options.hasOwnProperty('default')) {
+      this.default = {value: <T>options.default};
+    }
+
     this.parse = options.parse;
+    this.metaVar = options.metaVar.toUpperCase();
   }
 
   public evaluate(tokens: Token[]): IEvaluatedArgument<T> {
     const positionalArgToken = tokens.find(token => token.type === 'arg') || null;
 
     if (positionalArgToken === null) {
+      if (this.default === null) {
+        throw new Error(`${this.metaVar} is a required positional argument`);
+      }
+
       return {
         newTokens: tokens,
-        value: this.default
+        value: this.default.value
       };
     }
 

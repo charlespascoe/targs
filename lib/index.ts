@@ -303,6 +303,33 @@ export class PositionalArgument<T> extends Argument<T> {
 }
 
 
+export interface IMultiPositionalArgumentOptions<T> {
+  description?: string;
+  parse: (val: string) => T;
+}
+
+
+export class MultiPositionalArgument<T> extends Argument<T[]> {
+  public readonly description: string | null;
+
+  private readonly parse: (val: string) => T;
+
+  constructor(options: IMultiPositionalArgumentOptions<T>) {
+    super();
+
+    this.description = options.description || null;
+    this.parse = options.parse;
+  }
+
+  public evaluate(tokens: Token[]): IEvaluatedArgument<T[]> {
+    return {
+      newTokens: tokens.filter(token => token.type !== 'arg'),
+      value: tokens.filter(token => token.type === 'arg').map(token => this.parse((<IArgumentToken>token).argument))
+    };
+  }
+}
+
+
 export type ArgumentParserOptions<T> = {
   [K in keyof T]: Argument<T[K]>;
 };

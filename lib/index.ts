@@ -260,7 +260,36 @@ export type ArgumentParserOptions<T> = {
 export class ArgumentParser<T> {
   constructor(
     private parsers: ArgumentParserOptions<T>
-  ) {  }
+  ) {
+    this.validateParsers();
+  }
+
+  private validateParsers() {
+    const shortFlags: {[short: string]: string} = {};
+    const longFlags: {[long: string]: string} = {};
+
+    for (const key in this.parsers) {
+      const parser = this.parsers[key];
+
+      if (parser instanceof Optional) {
+        if (parser.short !== null) {
+          if (shortFlags.hasOwnProperty(parser.short)) {
+            throw new Error(`-${parser.short} defined for both ${shortFlags[parser.short]} and ${key}`);
+          } else {
+            shortFlags[parser.short] = key;
+          }
+        }
+
+        if (parser.long !== null) {
+          if (longFlags.hasOwnProperty(parser.long)) {
+            throw new Error(`--${parser.long} defined for both ${longFlags[parser.long]} and ${key}`);
+          } else {
+            longFlags[parser.long] = key;
+          }
+        }
+      }
+    }
+  }
 
   public parse(args: string[]): T {
     const result: any = {};

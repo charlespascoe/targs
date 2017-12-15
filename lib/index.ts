@@ -6,6 +6,7 @@ import {
   longOptionNameRegex
 } from './tokens';
 export * from './tokens';
+import { without } from './utils';
 
 
 export interface IEvaluatedArgument<T> {
@@ -114,6 +115,44 @@ export class Flag extends Optional<boolean> {
     return {
       newTokens: tokens.filter(token => token !== flagToken),
       value: !this.default
+    };
+  }
+}
+
+
+export interface ICountFlagOptions extends IOptionalOptions {
+  default?: number;
+}
+
+
+export class CountFlag extends Optional<number> {
+  public readonly default: number = 0;
+
+  constructor(options: ICountFlagOptions) {
+    super(options);
+
+    if (typeof options.default === 'number') {
+      this.default = options.default;
+    }
+  }
+
+  public evaluate(tokens: Token[]): IEvaluatedArgument<number> {
+    const flagTokens = tokens.filter(token => token.type === 'short' && token.value === this.short || token.type === 'long' && token.value === this.long);
+
+    if (flagTokens.length === 0) {
+      return {
+        newTokens: tokens,
+        value: this.default
+      };
+    }
+
+    if (flagTokens.some(token => token.argument !== null)) {
+      throw new Error(`Do not provide an argument for the ${this.getShortLongOptions()} flag`);
+    }
+
+    return {
+      value: flagTokens.length,
+      newTokens: without(tokens, flagTokens)
     };
   }
 }

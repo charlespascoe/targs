@@ -1,3 +1,3 @@
 export * from './argument-parser';
-export * from './parsers/index';
+export * from './parsers';
 export * from './tokens';

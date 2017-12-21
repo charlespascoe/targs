@@ -17,6 +17,8 @@ export interface IEvaluatedArgument<T> {
 
 export abstract class Argument<T> {
   public abstract evaluate(tokens: Token[]): IEvaluatedArgument<T>;
+
+  public abstract getUsageExample(): string;
 }
 
 
@@ -54,6 +56,10 @@ export abstract class Optional<T> extends Argument<T> {
     if (this.short === null && this.long === null) {
       throw new Error('Either a short or long flag/option must be provided');
     }
+  }
+
+  protected getUsageExampleOption(): string {
+    return `-${this.short ? '' : '-'}${this.short || this.long}`;
   }
 
   protected getShortLongOptions(): string {
@@ -117,6 +123,10 @@ export class Flag extends Optional<boolean> {
       value: !this.default
     };
   }
+
+  public getUsageExample() {
+    return `[${this.getUsageExampleOption()}]`;
+  }
 }
 
 
@@ -155,11 +165,16 @@ export class CountFlag extends Optional<number> {
       newTokens: without(tokens, flagTokens)
     };
   }
+
+  public getUsageExample() {
+    return `[${this.getUsageExampleOption()}...]`;
+  }
 }
 
 
 export interface IOptionalArgumentOptions<T> extends IOptionalOptions {
   default: T;
+  metaVar: string;
   parse: (val: string) => T;
 }
 
@@ -167,12 +182,15 @@ export interface IOptionalArgumentOptions<T> extends IOptionalOptions {
 export class OptionalArgument<T> extends Optional<T> {
   public readonly default: T;
 
+  public readonly metaVar: string;
+
   private readonly parse: (val: string) => T;
 
   constructor(options: IOptionalArgumentOptions<T>) {
     super(options);
 
     this.default = options.default;
+    this.metaVar = options.metaVar;
     this.parse = options.parse;
   }
 
@@ -212,19 +230,27 @@ export class OptionalArgument<T> extends Optional<T> {
       value: this.parse(argumentToken.argument)
     };
   }
+
+  public getUsageExample(): string {
+    return `[${this.getUsageExampleOption()} ${this.metaVar}]`;
+  }
 }
 
 
 export interface IMultiOptionalArgumentOptions<T> extends IOptionalOptions {
+  metaVar: string;
   parse: (val: string) => T;
 }
 
 
 export class MultiOptionalArgument<T> extends Optional<T[]> {
+  public readonly metaVar: string;
+
   private parse: (val: string) => T;
 
   constructor(options: IMultiOptionalArgumentOptions<T>) {
     super(options);
+    this.metaVar = options.metaVar;
     this.parse = options.parse;
   }
 
@@ -262,6 +288,10 @@ export class MultiOptionalArgument<T> extends Optional<T[]> {
       newTokens,
       value: result
     };
+  }
+
+  public getUsageExample(): string {
+    return `[${this.getUsageExampleOption()} ${this.metaVar}...]`;
   }
 }
 
@@ -313,6 +343,10 @@ export class PositionalArgument<T> extends Argument<T> {
       value: this.parse((<IArgumentToken>positionalArgToken).argument)
     };
   }
+
+  public getUsageExample(): string {
+    return this.metaVar;
+  }
 }
 
 
@@ -356,6 +390,10 @@ export class MultiPositionalArgument<T> extends Argument<T[]> {
       newTokens: tokens.filter(token => token.type !== 'arg'),
       value: parsedArgs
     };
+  }
+
+  public getUsageExample(): string {
+    return `${this.metaVar} `.repeat(this.min) + `[${this.metaVar}...]`;
   }
 }
 
@@ -422,5 +460,38 @@ export class ArgumentParser<T> {
     }
 
     return result;
+  }
+
+  public help(): string {
+    let help = 'usage: <program> ' + this.generateOptionsHelp() + ' ' + this.generatePositionalArgumentsHelp();
+    return help;
+  }
+
+  private generateOptionsHelp(): string {
+    const optionHelp: string[] = [];
+
+    for (const key in this.parsers) {
+      const parser = this.parsers[key];
+
+      if (parser instanceof Optional) {
+        optionHelp.push(parser.getUsageExample());
+      }
+    }
+
+    return optionHelp.join(' ');
+  }
+
+  private generatePositionalArgumentsHelp(): string {
+    const posArgHelp: string[] = [];
+
+    for (const key in this.parsers) {
+      const parser = this.parsers[key];
+
+      if (!(parser instanceof Optional)) {
+        posArgHelp.push(parser.getUsageExample());
+      }
+    }
+
+    return posArgHelp.join(' ');
   }
 }

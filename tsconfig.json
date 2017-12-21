@@ -3,11 +3,12 @@
     "outDir": "./dist/",
     "sourceMap": true,
     "declaration": true,
-    "baseUrl": "./lib/",
+    "baseUrl": ".",
     "paths": {
-      "targs/*": ["*"]
+      "targs/*": ["./lib/*"]
     },
-    "target": "ES6",
+    "target": "ES5",
+    "lib": ["ES6"],
     "strict": true
   },
   "include": ["./lib/"]

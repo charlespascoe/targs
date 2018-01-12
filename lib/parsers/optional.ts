@@ -42,6 +42,26 @@ export abstract class Optional<T> extends Argument<T> {
     return `-${this.short ? '' : '-'}${this.short || this.long}`;
   }
 
+  public getHelpKey(): string {
+    let result = '';
+
+    if (this.short) {
+      result = `-${this.short}`;
+    }
+
+    if (this.long) {
+      if (result.length > 0) {
+        result += ', ';
+      } else {
+        result = '    ';
+      }
+
+      result += `--${this.long}`;
+    }
+
+    return result;
+  }
+
   protected getShortLongOptions(): string {
     let result = '';
 

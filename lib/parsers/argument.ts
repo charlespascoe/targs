@@ -13,4 +13,6 @@ export abstract class Argument<T> {
   public abstract evaluate(tokens: Token[]): IEvaluatedArgument<T>;
 
   public abstract getUsageExample(): string;
+
+  public abstract getHelpKey(): string;
 }

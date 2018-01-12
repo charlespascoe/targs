@@ -50,7 +50,11 @@ export class PositionalArgument<T> extends Argument<T> {
     };
   }
 
-  public getUsageExample(): string {
+  public getHelpKey(): string {
     return this.metaVar;
+  }
+
+  public getUsageExample(): string {
+    return this.required ? this.metaVar : `[${this.metaVar}]`;
   }
 }

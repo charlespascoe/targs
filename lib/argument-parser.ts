@@ -1,6 +1,8 @@
 import { Argument } from './parsers/argument';
 import { Optional } from './parsers/optional';
 import { tokeniseArguments } from './tokens';
+import { keysOf } from './utils';
+import { HelpFormatter } from './help-formatter';
 
 
 export type ArgumentParserOptions<T> = {
@@ -9,10 +11,13 @@ export type ArgumentParserOptions<T> = {
 
 
 export class ArgumentParser<T> {
+  private readonly helpFormatter: HelpFormatter;
+
   constructor(
     private parsers: ArgumentParserOptions<T>
   ) {
     this.validateParsers();
+    this.helpFormatter = new HelpFormatter();
   }
 
   private validateParsers() {
@@ -67,36 +72,7 @@ export class ArgumentParser<T> {
     return result;
   }
 
-  public help(): string {
-    let help = 'usage: <program> ' + this.generateOptionsHelp() + ' ' + this.generatePositionalArgumentsHelp();
-    return help;
-  }
-
-  private generateOptionsHelp(): string {
-    const optionHelp: string[] = [];
-
-    for (const key in this.parsers) {
-      const parser = this.parsers[key];
-
-      if (parser instanceof Optional) {
-        optionHelp.push(parser.getUsageExample());
-      }
-    }
-
-    return optionHelp.join(' ');
-  }
-
-  private generatePositionalArgumentsHelp(): string {
-    const posArgHelp: string[] = [];
-
-    for (const key in this.parsers) {
-      const parser = this.parsers[key];
-
-      if (!(parser instanceof Optional)) {
-        posArgHelp.push(parser.getUsageExample());
-      }
-    }
-
-    return posArgHelp.join(' ');
+  public help(programName: string): string {
+    return this.helpFormatter.format(programName, keysOf(this.parsers).map(key => this.parsers[key]));
   }
 }

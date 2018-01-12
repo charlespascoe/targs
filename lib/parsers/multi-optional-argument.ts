@@ -57,6 +57,6 @@ export class MultiOptionalArgument<T> extends Optional<T[]> {
   }
 
   public getUsageExample(): string {
-    return `[${this.getUsageExampleOption()} ${this.metaVar}...]`;
+    return `[${this.getUsageExampleOption()} ${this.metaVar}]...`;
   }
 }

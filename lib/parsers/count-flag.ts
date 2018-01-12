@@ -41,6 +41,6 @@ export class CountFlag extends Optional<number> {
   }
 
   public getUsageExample() {
-    return `[${this.getUsageExampleOption()}...]`;
+    return `[${this.getUsageExampleOption()}]...`;
   }
 }

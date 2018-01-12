@@ -45,6 +45,6 @@ export class MultiPositionalArgument<T> extends Argument<T[]> {
   }
 
   public getUsageExample(): string {
-    return `${this.metaVar} `.repeat(this.min) + `[${this.metaVar}...]`;
+    return `${this.metaVar} `.repeat(this.min) + `[${this.metaVar}]...`;
   }
 }

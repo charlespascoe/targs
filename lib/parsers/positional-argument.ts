@@ -20,7 +20,7 @@ export class PositionalArgument<T> extends Argument<T> {
   private readonly parse: (val: string) => T;
 
   constructor(options: IPositionalArgumentOptions<T>) {
-    super();
+    super(options.description || '');
 
     if (options.hasOwnProperty('default')) {
       this.default = {value: <T>options.default};

@@ -11,8 +11,6 @@ export interface IMultiPositionalArgumentOptions<T> {
 
 
 export class MultiPositionalArgument<T> extends Argument<T[]> {
-  public readonly description: string | null;
-
   public readonly metaVar: string;
 
   public readonly min: number = 0;
@@ -20,9 +18,8 @@ export class MultiPositionalArgument<T> extends Argument<T[]> {
   private readonly parse: (val: string) => T;
 
   constructor(options: IMultiPositionalArgumentOptions<T>) {
-    super();
+    super(options.description || '');
 
-    this.description = options.description || null;
     this.metaVar = options.metaVar;
     this.parse = options.parse;
 

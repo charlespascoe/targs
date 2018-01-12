@@ -15,7 +15,7 @@ export abstract class Optional<T> extends Argument<T> {
   public readonly long: string | null = null;
 
   constructor(options: IOptionalOptions) {
-    super();
+    super(options.description || '');
 
     if (typeof options.short === 'string') {
       if (!shortOptionNameRegex.test(options.short)) {

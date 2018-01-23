@@ -1,6 +1,6 @@
 import { Argument } from './parsers/argument';
 import { Optional } from './parsers/optional';
-import { tokeniseArguments } from './tokens';
+import { tokeniseArguments, Token } from './tokens';
 import { keysOf } from './utils';
 import { HelpFormatter } from './help-formatter';
 
@@ -48,9 +48,11 @@ export class ArgumentParser<T> {
   }
 
   public parse(args: string[]): T {
-    const result: any = {};
+    return this.parseTokens(tokeniseArguments(args));
+  }
 
-    let tokens = tokeniseArguments(args);
+  public parseTokens(tokens: Token[]): T {
+    const result: any = {};
 
     // Process flags and optional arguments first
     for (const key in this.parsers) {

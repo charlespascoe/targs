@@ -69,6 +69,16 @@ export class ArgumentParser<T> {
       }
     }
 
+    if (tokens.length > 0) {
+      const token = tokens[0];
+
+      if (token.type === 'arg') {
+        throw new Error(`Unexpected positional argument: ${token.argument}`);
+      } else {
+        throw new Error(`Unknown option: -${token.type === 'long' ? '-' : ''}${token.value}`);
+      }
+    }
+
     return result;
   }
 

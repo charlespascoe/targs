@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "outDir": "./dist/",
+    "sourceMap": true,
+    "declaration": true,
+    "baseUrl": ".",
+    "paths": {
+      "targs/*": ["./lib/*"]
+    },
+    "target": "ES5",
+    "lib": ["ES6"],
+    "strict": true
+  },
+  "include": ["./lib/"]
+}

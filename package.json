@@ -2,13 +2,14 @@
   "name": "targs",
   "version": "0.1.2",
   "description": "Strongly-Typed Command Line Argument Parsing",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "index.js",
+  "types": "index.d.ts",
   "scripts": {
     "build": "rm -rf ./dist/ && tsc --pretty || exit 0",
     "watch": "rm -rf ./dist/ && tsc --pretty -w",
     "clean": "rm -rf ./dist/",
-    "test": "mocha -r ts-node/register tests/*.spec.ts tests/**/*.spec.ts"
+    "test": "mocha -r ts-node/register tests/*.spec.ts tests/**/*.spec.ts",
+    "publish": "npm run build && cp package.json ./dist/ && cd ./dist/ && npm publish"
   },
   "repository": {
     "type": "git",

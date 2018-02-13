@@ -1,6 +1,6 @@
 {
   "name": "targs",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Strongly-Typed Command Line Argument Parsing",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

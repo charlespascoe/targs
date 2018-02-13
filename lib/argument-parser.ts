@@ -1,7 +1,8 @@
 import { Argument } from './parsers/argument';
 import { Optional } from './parsers/optional';
+import { Flag } from './parsers/flag';
 import { tokeniseArguments } from './tokens';
-import { keysOf } from './utils';
+import { programName, keysOf } from './utils';
 import { HelpFormatter } from './help-formatter';
 
 
@@ -13,9 +14,18 @@ export type ArgumentParserOptions<T> = {
 export class ArgumentParser<T> {
   private readonly helpFormatter: HelpFormatter;
 
+  public programName: string;
+
+  public helpFlag: Flag | null;
+
   constructor(
     private parsers: ArgumentParserOptions<T>
   ) {
+    this.helpFlag = new Flag({
+      short: 'h',
+      long: 'help',
+      description: 'Prints help and quits'
+    });
     this.validateParsers();
     this.helpFormatter = new HelpFormatter();
   }
@@ -52,6 +62,17 @@ export class ArgumentParser<T> {
 
     let tokens = tokeniseArguments(args);
 
+    if (this.helpFlag !== null) {
+      const { newTokens, value } = this.helpFlag.evaluate(tokens);
+
+      if (value) {
+        console.log(this.help());
+        process.exit(0);
+      }
+
+      tokens = newTokens;
+    }
+
     // Process flags and optional arguments first
     for (const key in this.parsers) {
       if (this.parsers[key] instanceof Optional) {
@@ -82,7 +103,13 @@ export class ArgumentParser<T> {
     return result;
   }
 
-  public help(programName: string): string {
-    return this.helpFormatter.format(programName, keysOf(this.parsers).map(key => this.parsers[key]));
+  public help(): string {
+    const parsers = keysOf(this.parsers).map<Argument<any>>(key => this.parsers[key]);
+
+    if (this.helpFlag !== null) {
+      parsers.push(this.helpFlag);
+    }
+
+    return this.helpFormatter.format(this.programName, parsers);
   }
 }

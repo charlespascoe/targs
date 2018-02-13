@@ -1,3 +1,6 @@
+import * as path from 'path';
+
+
 export function without<T>(items: T[], withoutItems: T[]): T[] {
   const withoutItemsSet = new Set(withoutItems);
 
@@ -50,3 +53,6 @@ export function formatText(text: string, width: number): string {
   lines.push(currentLine);
   return lines.join('\n');
 }
+
+
+export const programName = path.basename((process.argv[1] || '').replace('.js', ''));

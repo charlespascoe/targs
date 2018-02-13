@@ -26,6 +26,7 @@ export class ArgumentParser<T> {
       long: 'help',
       description: 'Prints help and quits'
     });
+    this.programName = programName;
     this.validateParsers();
     this.helpFormatter = new HelpFormatter();
   }

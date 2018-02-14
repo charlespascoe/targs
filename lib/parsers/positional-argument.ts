@@ -17,7 +17,7 @@ export class PositionalArgument<T> extends Argument<T> {
 
   public readonly metaVar: string;
 
-  private readonly parse: (val: string) => T;
+  private readonly parseValue: (val: string) => T;
 
   constructor(options: IPositionalArgumentOptions<T>) {
     super(options.description || '');
@@ -26,11 +26,11 @@ export class PositionalArgument<T> extends Argument<T> {
       this.default = {value: <T>options.default};
     }
 
-    this.parse = options.parse;
+    this.parseValue = options.parse;
     this.metaVar = options.metaVar.toUpperCase();
   }
 
-  public evaluate(tokens: Token[]): IEvaluatedArgument<T> {
+  protected evaluate(tokens: Token[]): IEvaluatedArgument<T> {
     const positionalArgToken = tokens.find(token => token.type === 'arg') || null;
 
     if (positionalArgToken === null) {
@@ -46,7 +46,7 @@ export class PositionalArgument<T> extends Argument<T> {
 
     return {
       newTokens: tokens.filter(token => token !== positionalArgToken),
-      value: this.parse((<IArgumentToken>positionalArgToken).argument)
+      value: this.parseValue((<IArgumentToken>positionalArgToken).argument)
     };
   }
 

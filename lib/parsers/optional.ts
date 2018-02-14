@@ -2,10 +2,11 @@ import { shortOptionNameRegex, longOptionNameRegex } from '../tokens';
 import { Argument } from './argument';
 
 
-export interface IOptionalOptions {
+export interface IOptionalOptions<T> {
   short?: string;
   long?: string;
   description?: string;
+  run?: (arg: T) => void;
 }
 
 
@@ -14,8 +15,8 @@ export abstract class Optional<T> extends Argument<T> {
 
   public readonly long: string | null = null;
 
-  constructor(options: IOptionalOptions) {
-    super(options.description || '');
+  constructor(options: IOptionalOptions<T>) {
+    super(options.description || '', options.run);
 
     if (typeof options.short === 'string') {
       if (!shortOptionNameRegex.test(options.short)) {

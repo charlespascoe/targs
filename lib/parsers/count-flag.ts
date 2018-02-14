@@ -4,7 +4,7 @@ import { Optional, IOptionalOptions } from './optional';
 import { without } from '../utils';
 
 
-export interface ICountFlagOptions extends IOptionalOptions {
+export interface ICountFlagOptions extends IOptionalOptions<number> {
   default?: number;
 }
 
@@ -20,7 +20,7 @@ export class CountFlag extends Optional<number> {
     }
   }
 
-  public evaluate(tokens: Token[]): IEvaluatedArgument<number> {
+  protected evaluate(tokens: Token[]): IEvaluatedArgument<number> {
     const flagTokens = tokens.filter(token => token.type === 'short' && token.value === this.short || token.type === 'long' && token.value === this.long);
 
     if (flagTokens.length === 0) {

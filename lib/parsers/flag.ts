@@ -3,7 +3,7 @@ import { IEvaluatedArgument } from './argument';
 import { Optional, IOptionalOptions } from './optional';
 
 
-export interface IFlagOptions extends IOptionalOptions {
+export interface IFlagOptions extends IOptionalOptions<boolean> {
   default?: boolean;
 }
 
@@ -19,7 +19,7 @@ export class Flag extends Optional<boolean> {
     }
   }
 
-  public evaluate(tokens: Token[]): IEvaluatedArgument<boolean> {
+  protected evaluate(tokens: Token[]): IEvaluatedArgument<boolean> {
     const flagTokens = tokens.filter(token => token.type === 'short' && token.value === this.short || token.type === 'long' && token.value === this.long);
 
     if (flagTokens.length === 0) {

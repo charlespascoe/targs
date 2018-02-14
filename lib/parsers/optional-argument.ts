@@ -3,7 +3,7 @@ import { IEvaluatedArgument } from './argument';
 import { Optional, IOptionalOptions } from './optional';
 
 
-export interface IOptionalArgumentOptions<T> extends IOptionalOptions {
+export interface IOptionalArgumentOptions<T> extends IOptionalOptions<T> {
   default: T;
   metaVar: string;
   parse: (val: string) => T;
@@ -15,17 +15,17 @@ export class OptionalArgument<T> extends Optional<T> {
 
   public readonly metaVar: string;
 
-  private readonly parse: (val: string) => T;
+  private readonly parseValue: (val: string) => T;
 
   constructor(options: IOptionalArgumentOptions<T>) {
     super(options);
 
     this.default = options.default;
     this.metaVar = options.metaVar;
-    this.parse = options.parse;
+    this.parseValue = options.parse;
   }
 
-  public evaluate(tokens: Token[]): IEvaluatedArgument<T> {
+  protected evaluate(tokens: Token[]): IEvaluatedArgument<T> {
     const optionTokens = tokens.filter(token => token.type === 'short' && token.value === this.short || token.type === 'long' && token.value === this.long);
 
     if (optionTokens.length === 0) {
@@ -44,7 +44,7 @@ export class OptionalArgument<T> extends Optional<T> {
     if (optionToken.argument !== null) {
       return {
         newTokens: tokens.filter(token => token !== optionToken),
-        value: this.parse(optionToken.argument)
+        value: this.parseValue(optionToken.argument)
       };
     }
 
@@ -58,7 +58,7 @@ export class OptionalArgument<T> extends Optional<T> {
 
     return {
       newTokens: tokens.filter(token => token !== optionToken && token !== argumentToken),
-      value: this.parse(argumentToken.argument)
+      value: this.parseValue(argumentToken.argument)
     };
   }
 

@@ -1,6 +1,6 @@
 {
   "name": "targs",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Strongly-Typed Command Line Argument Parsing",
   "main": "index.js",
   "types": "index.d.ts",
@@ -9,7 +9,7 @@
     "watch": "rm -rf ./dist/ && tsc --pretty -w",
     "clean": "rm -rf ./dist/",
     "test": "mocha -r ts-node/register tests/*.spec.ts tests/**/*.spec.ts",
-    "publish": "npm run build && cp package.json ./dist/ && cd ./dist/ && npm publish"
+    "pub": "npm run build && cp package.json ./dist/ && npm publish ./dist/"
   },
   "repository": {
     "type": "git",

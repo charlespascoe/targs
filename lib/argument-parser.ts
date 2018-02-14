@@ -64,7 +64,7 @@ export class ArgumentParser<T> {
     let tokens = tokeniseArguments(args);
 
     if (this.helpFlag !== null) {
-      const { newTokens, value } = this.helpFlag.evaluate(tokens);
+      const { newTokens, value } = this.helpFlag.parse(tokens);
 
       if (value) {
         console.log(this.help());
@@ -77,7 +77,7 @@ export class ArgumentParser<T> {
     // Process flags and optional arguments first
     for (const key in this.parsers) {
       if (this.parsers[key] instanceof Optional) {
-        const { newTokens, value } = this.parsers[key].evaluate(tokens);
+        const { newTokens, value } = this.parsers[key].parse(tokens);
         result[key] = value;
         tokens = newTokens;
       }
@@ -85,7 +85,7 @@ export class ArgumentParser<T> {
 
     for (const key in this.parsers) {
       if (!(this.parsers[key] instanceof Optional)) {
-        const { newTokens, value } = this.parsers[key].evaluate(tokens);
+        const { newTokens, value } = this.parsers[key].parse(tokens);
         result[key] = value;
         tokens = newTokens;
       }

@@ -7,6 +7,7 @@ export interface IMultiPositionalArgumentOptions<T> {
   parse: (val: string) => T;
   metaVar: string;
   min?: number;
+  run?: (arg: T[]) => void;
 }
 
 
@@ -15,21 +16,21 @@ export class MultiPositionalArgument<T> extends Argument<T[]> {
 
   public readonly min: number = 0;
 
-  private readonly parse: (val: string) => T;
+  private readonly parseValue: (val: string) => T;
 
   constructor(options: IMultiPositionalArgumentOptions<T>) {
-    super(options.description || '');
+    super(options.description || '', options.run);
 
     this.metaVar = options.metaVar;
-    this.parse = options.parse;
+    this.parseValue = options.parse;
 
     if (typeof options.min === 'number') {
       this.min = options.min;
     }
   }
 
-  public evaluate(tokens: Token[]): IEvaluatedArgument<T[]> {
-    const parsedArgs = tokens.filter(token => token.type === 'arg').map(token => this.parse((<IArgumentToken>token).argument));
+  protected evaluate(tokens: Token[]): IEvaluatedArgument<T[]> {
+    const parsedArgs = tokens.filter(token => token.type === 'arg').map(token => this.parseValue((<IArgumentToken>token).argument));
 
     if (parsedArgs.length < this.min) {
       throw new Error(`${this.metaVar} requires at least ${this.min} argument${this.min === 1 ? '': 's'}`);

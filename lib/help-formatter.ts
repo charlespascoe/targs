@@ -29,19 +29,19 @@ export class HelpFormatter {
 
   public format(programName: string, parsers: Argument<any>[]): string {
     return `usage: ${programName} ` +
-      this.generateOptionsHelp(parsers) + ' ' +
-      this.generatePositionalArgumentsHelp(parsers) + '\n' +
+      this.generateOptionHints(parsers) + ' ' +
+      this.generatePositionalArgumentHints(parsers) + '\n' +
       this.generateHelpDescription(parsers);
   }
 
-  private generateOptionsHelp(parsers: Argument<any>[]): string {
+  private generateOptionHints(parsers: Argument<any>[]): string {
     return parsers
       .filter((parser) => parser instanceof Optional)
       .map((parser) => parser.getUsageExample())
       .join(' ');
   }
 
-  private generatePositionalArgumentsHelp(parsers: Argument<any>[]): string {
+  private generatePositionalArgumentHints(parsers: Argument<any>[]): string {
     return parsers
       .filter((parser) => !(parser instanceof Optional))
       .map((parser) => parser.getUsageExample())
@@ -53,15 +53,32 @@ export class HelpFormatter {
       .map(parser => parser.getHelpKey().length)
       .reduce((longest, length) => Math.max(longest, length), 0);
 
-    return 'Positional arguments:\n' +
+    const postitionalArgs = parsers.filter(parser => !(parser instanceof Optional));
+    const optionalArgs = parsers.filter(parser => parser instanceof Optional);
+
+    let result = '';
+
+    if (postitionalArgs.length > 0) {
+      result += 'Positional arguments:\n' +
       parsers
         .filter(parser => !(parser instanceof Optional))
         .map(parser => this.formatParserHelpDescription(parser, keyColumnWidth))
-        .join('\n') + '\n\nOptions:\n' +
-      parsers
-        .filter(parser => parser instanceof Optional)
-        .map(parser => this.formatParserHelpDescription(parser, keyColumnWidth))
         .join('\n');
+    }
+
+    if (optionalArgs.length > 0) {
+      if (result.length > 0) {
+        result += '\n\n';
+      }
+
+      result += 'Options:\n' +
+        parsers
+          .filter(parser => parser instanceof Optional)
+          .map(parser => this.formatParserHelpDescription(parser, keyColumnWidth))
+          .join('\n');
+    }
+
+    return result;
   }
 
   private formatParserHelpDescription(parser: Argument<any>, keyColumnWidth: number): string {

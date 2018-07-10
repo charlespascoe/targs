@@ -1,7 +1,8 @@
 import { Argument } from './parsers/argument';
 import { Optional } from './parsers/optional';
+import { Flag } from './parsers/flag';
 import { tokeniseArguments, Token } from './tokens';
-import { keysOf } from './utils';
+import { programName, keysOf } from './utils';
 import { HelpFormatter } from './help-formatter';
 
 
@@ -13,9 +14,19 @@ export type ArgumentParserOptions<T> = {
 export class ArgumentParser<T> {
   private readonly helpFormatter: HelpFormatter;
 
+  public programName: string;
+
+  public helpFlag: Flag | null;
+
   constructor(
     private parsers: ArgumentParserOptions<T>
   ) {
+    this.helpFlag = new Flag({
+      short: 'h',
+      long: 'help',
+      description: 'Prints help and quits'
+    });
+    this.programName = programName;
     this.validateParsers();
     this.helpFormatter = new HelpFormatter();
   }
@@ -54,10 +65,21 @@ export class ArgumentParser<T> {
   public parseTokens(tokens: Token[]): T {
     const result: any = {};
 
+    if (this.helpFlag !== null) {
+      const { newTokens, value } = this.helpFlag.parse(tokens);
+
+      if (value) {
+        console.log(this.help());
+        process.exit(0);
+      }
+
+      tokens = newTokens;
+    }
+
     // Process flags and optional arguments first
     for (const key in this.parsers) {
       if (this.parsers[key] instanceof Optional) {
-        const { newTokens, value } = this.parsers[key].evaluate(tokens);
+        const { newTokens, value } = this.parsers[key].parse(tokens);
         result[key] = value;
         tokens = newTokens;
       }
@@ -65,16 +87,32 @@ export class ArgumentParser<T> {
 
     for (const key in this.parsers) {
       if (!(this.parsers[key] instanceof Optional)) {
-        const { newTokens, value } = this.parsers[key].evaluate(tokens);
+        const { newTokens, value } = this.parsers[key].parse(tokens);
         result[key] = value;
         tokens = newTokens;
+      }
+    }
+
+    if (tokens.length > 0) {
+      const token = tokens[0];
+
+      if (token.type === 'arg') {
+        throw new Error(`Unexpected positional argument: ${token.argument}`);
+      } else {
+        throw new Error(`Unknown option: -${token.type === 'long' ? '-' : ''}${token.value}`);
       }
     }
 
     return result;
   }
 
-  public help(programName: string): string {
-    return this.helpFormatter.format(programName, keysOf(this.parsers).map(key => this.parsers[key]));
+  public help(): string {
+    const parsers = keysOf(this.parsers).map<Argument<any>>(key => this.parsers[key]);
+
+    if (this.helpFlag !== null) {
+      parsers.push(this.helpFlag);
+    }
+
+    return this.helpFormatter.format(this.programName, parsers);
   }
 }

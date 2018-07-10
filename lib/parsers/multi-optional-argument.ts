@@ -3,7 +3,7 @@ import { IEvaluatedArgument } from './argument';
 import { Optional, IOptionalOptions } from './optional';
 
 
-export interface IMultiOptionalArgumentOptions<T> extends IOptionalOptions {
+export interface IMultiOptionalArgumentOptions<T> extends IOptionalOptions<T[]> {
   metaVar: string;
   parse: (val: string) => T;
 }
@@ -12,15 +12,15 @@ export interface IMultiOptionalArgumentOptions<T> extends IOptionalOptions {
 export class MultiOptionalArgument<T> extends Optional<T[]> {
   public readonly metaVar: string;
 
-  private parse: (val: string) => T;
+  private parseValue: (val: string) => T;
 
   constructor(options: IMultiOptionalArgumentOptions<T>) {
     super(options);
     this.metaVar = options.metaVar;
-    this.parse = options.parse;
+    this.parseValue = options.parse;
   }
 
-  public evaluate(tokens: Token[]): IEvaluatedArgument<T[]> {
+  protected evaluate(tokens: Token[]): IEvaluatedArgument<T[]> {
     let newTokens = tokens.map(token => token);
 
     const result: T[] = [];
@@ -30,7 +30,7 @@ export class MultiOptionalArgument<T> extends Optional<T[]> {
 
       if (token.type === 'short' && token.value === this.short || token.type === 'long' && token.value === this.long) {
         if (token.argument !== null) {
-          result.unshift(this.parse(token.argument));
+          result.unshift(this.parseValue(token.argument));
           newTokens.splice(i, 1);
           continue;
         }
@@ -45,7 +45,7 @@ export class MultiOptionalArgument<T> extends Optional<T[]> {
           throw new Error(`${this.getShortLongOptions()} requires an argument`);
         }
 
-        result.unshift(this.parse(nextToken.argument));
+        result.unshift(this.parseValue(nextToken.argument));
         newTokens.splice(i, 2);
       }
     }

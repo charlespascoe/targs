@@ -6,7 +6,7 @@ import { rightPad, formatText } from './utils';
 
 
 export class HelpFormatter {
-  private _width: number;
+  private _width: number = 100;
 
   public get width() { return this._width; }
   public set width(value: number) {

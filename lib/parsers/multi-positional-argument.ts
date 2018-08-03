@@ -1,4 +1,4 @@
-import { Token, IArgumentToken } from '../tokens';
+import { Token, PositionalToken } from '../tokens';
 import { Argument, IEvaluatedArgument } from './argument';
 
 
@@ -30,14 +30,14 @@ export class MultiPositionalArgument<T> extends Argument<T[]> {
   }
 
   protected evaluate(tokens: Token[]): IEvaluatedArgument<T[]> {
-    const parsedArgs = tokens.filter(token => token.type === 'arg').map(token => this.parseValue((<IArgumentToken>token).argument));
+    const parsedArgs = tokens.filter(token => token.type === 'positional').map(token => this.parseValue((<PositionalToken>token).value));
 
     if (parsedArgs.length < this.min) {
       throw new Error(`${this.metaVar} requires at least ${this.min} argument${this.min === 1 ? '': 's'}`);
     }
 
     return {
-      newTokens: tokens.filter(token => token.type !== 'arg'),
+      newTokens: tokens.filter(token => token.type !== 'positional'),
       value: parsedArgs
     };
   }

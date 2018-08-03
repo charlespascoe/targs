@@ -4,39 +4,54 @@ export const shortOptionsRegex = /^-[a-z0-9]+(=.*)?$/i;
 export const longOptionRegex = /^--[a-z0-9]+(-[a-z0-9]+)*(=.*)?$/i;
 
 
-export interface IShortOptionToken {
+export interface ShortOptionToken {
   type: 'short';
   value: string;
   argument: string | null;
 }
 
 
-export interface ILongOptionToken {
+export interface LongOptionToken {
   type: 'long';
   value: string;
   argument: string | null;
 }
 
 
-export interface IArgumentToken {
-  type: 'arg';
-  argument: string;
+export interface PositionalToken {
+  type: 'positional';
+  value: string;
 }
 
 
-export type Token = IShortOptionToken | ILongOptionToken | IArgumentToken;
+export type Token = ShortOptionToken | LongOptionToken | PositionalToken;
 
 
-export function tokeniseArguments(args: string[]): Token[] {
+interface TokenParseSuccess {
+  success: true;
+  tokens: Token[];
+}
+
+interface TokenParseFailure {
+  success: false;
+  message: string;
+  args: string[];
+  index: number;
+}
+
+
+export function tokeniseArguments(args: string[]): TokenParseSuccess | TokenParseFailure {
   const tokens: Token[] = [];
 
   let finishedFlags = false;
 
-  for (const val of args) {
+  for (let index = 0; index < args.length; index++) {
+    const val = args[index];
+
     if (finishedFlags || !val.startsWith('-')) {
       tokens.push({
-        type: 'arg',
-        argument: val
+        type: 'positional',
+        value: val
       });
       continue;
     }
@@ -59,7 +74,7 @@ export function tokeniseArguments(args: string[]): Token[] {
         shortFlags = val.substr(1);
       }
 
-      let lastOption: IShortOptionToken | null = null;
+      let lastOption: ShortOptionToken | null = null;
 
       for (const shortOption of shortFlags.split('')) {
         lastOption = {
@@ -79,29 +94,35 @@ export function tokeniseArguments(args: string[]): Token[] {
     }
 
     if (longOptionRegex.test(val)) {
-      let argument: string | null = null;
-      let longFlag: string;
-
       const equalsIndex = val.indexOf('=');
 
       if (equalsIndex >= 0) {
-        argument = val.substr(equalsIndex + 1);
-        longFlag = val.substr(2, equalsIndex - 2);
+        tokens.push({
+          type: 'long',
+          value: val.substr(2, equalsIndex - 2),
+          argument: val.substr(equalsIndex + 1)
+        });
       } else {
-        longFlag = val.substr(2);
+        tokens.push({
+          type: 'long',
+          value: val.substr(2),
+          argument: null
+        });
       }
-
-      tokens.push({
-        type: 'long',
-        value: longFlag,
-        argument
-      });
 
       continue;
     }
 
-    throw new Error(`Unknown Flag/Option: ${val}`);
+    return {
+      success: false,
+      message: 'Unknown token',
+      args,
+      index
+    };
   }
 
-  return tokens;
+  return {
+    success: true,
+    tokens
+  };
 }

@@ -1,4 +1,4 @@
-import { Token } from '../tokens';
+import { Token, ShortOptionToken, LongOptionToken } from '../tokens';
 import { IEvaluatedArgument } from './argument';
 import { Optional, IOptionalOptions } from './optional';
 
@@ -20,7 +20,7 @@ export class Flag extends Optional<boolean> {
   }
 
   protected evaluate(tokens: Token[]): IEvaluatedArgument<boolean> {
-    const flagTokens = tokens.filter(token => token.type === 'short' && token.value === this.short || token.type === 'long' && token.value === this.long);
+    const flagTokens = tokens.filter((token): token is ShortOptionToken | LongOptionToken => token.type === 'short' && token.value === this.short || token.type === 'long' && token.value === this.long);
 
     if (flagTokens.length === 0) {
       return {

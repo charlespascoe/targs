@@ -1,4 +1,4 @@
-import { Token } from '../tokens';
+import { Token, ShortOptionToken, LongOptionToken } from '../tokens';
 import { IEvaluatedArgument } from './argument';
 import { Optional, IOptionalOptions } from './optional';
 import { without } from '../utils';
@@ -21,7 +21,7 @@ export class CountFlag extends Optional<number> {
   }
 
   protected evaluate(tokens: Token[]): IEvaluatedArgument<number> {
-    const flagTokens = tokens.filter(token => token.type === 'short' && token.value === this.short || token.type === 'long' && token.value === this.long);
+    const flagTokens = tokens.filter((token): token is ShortOptionToken | LongOptionToken => token.type === 'short' && token.value === this.short || token.type === 'long' && token.value === this.long);
 
     if (flagTokens.length === 0) {
       return {
@@ -30,7 +30,7 @@ export class CountFlag extends Optional<number> {
       };
     }
 
-    if (flagTokens.some(token => token.argument !== null)) {
+    if (flagTokens.some(token => token.value !== null)) {
       throw new Error(`Do not provide an argument for the ${this.getShortLongOptions()} flag`);
     }
 

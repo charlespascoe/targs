@@ -1,4 +1,4 @@
-import { Token, IArgumentToken } from '../tokens';
+import { Token, PositionalToken } from '../tokens';
 import { Argument, IEvaluatedArgument } from './argument';
 
 
@@ -31,7 +31,7 @@ export class PositionalArgument<T> extends Argument<T> {
   }
 
   protected evaluate(tokens: Token[]): IEvaluatedArgument<T> {
-    const positionalArgToken = tokens.find(token => token.type === 'arg') || null;
+    const positionalArgToken = tokens.find(token => token.type === 'positional') || null;
 
     if (positionalArgToken === null) {
       if (this.default === null) {
@@ -46,7 +46,7 @@ export class PositionalArgument<T> extends Argument<T> {
 
     return {
       newTokens: tokens.filter(token => token !== positionalArgToken),
-      value: this.parseValue((<IArgumentToken>positionalArgToken).argument)
+      value: this.parseValue((<PositionalToken>positionalArgToken).value)
     };
   }
 

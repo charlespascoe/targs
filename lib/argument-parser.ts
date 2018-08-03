@@ -61,7 +61,14 @@ export class ArgumentParser<T> {
   public parse(args: string[]): T {
     const result: any = {};
 
-    let tokens = tokeniseArguments(args);
+    const tokeniseResult = tokeniseArguments(args);
+
+    if (!tokeniseResult.success) {
+      const { message, index } = tokeniseResult;
+      throw new Error(`${message}: ${args[index]}`);
+    }
+
+    let tokens = tokeniseResult.tokens;
 
     if (this.helpFlag !== null) {
       const { newTokens, value } = this.helpFlag.parse(tokens);
@@ -94,8 +101,8 @@ export class ArgumentParser<T> {
     if (tokens.length > 0) {
       const token = tokens[0];
 
-      if (token.type === 'arg') {
-        throw new Error(`Unexpected positional argument: ${token.argument}`);
+      if (token.type === 'positional') {
+        throw new Error(`Unexpected positional argument: ${token.value}`);
       } else {
         throw new Error(`Unknown option: -${token.type === 'long' ? '-' : ''}${token.value}`);
       }

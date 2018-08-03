@@ -36,7 +36,7 @@ describe(className + '.constructor', () => {
 
 describe(className + '.evaluate()', () => {
   it('should return the default value when flag is missing', () => {
-    const result = new Flag({short: 'a', default: true}).evaluate([
+    const result = new Flag({short: 'a', default: true})['evaluate']([
       {
         type: 'short',
         value: 'b',
@@ -58,7 +58,7 @@ describe(className + '.evaluate()', () => {
 
   it('should throw an error when setting the flag multiple times', () => {
     expect(() => {
-      new Flag({short: 'a'}).evaluate([
+      new Flag({short: 'a'})['evaluate']([
         {
           type: 'short',
           value: 'a',
@@ -75,7 +75,7 @@ describe(className + '.evaluate()', () => {
 
   it('should throw an error when an argument is explicitly given to a flag', () => {
     expect(() => {
-      new Flag({short: 'a'}).evaluate([
+      new Flag({short: 'a'})['evaluate']([
         {
           type: 'short',
           value: 'a',
@@ -86,7 +86,7 @@ describe(className + '.evaluate()', () => {
   });
 
   it('should return the opposite of default when the flag is present', () => {
-    const result = new Flag({short: 'a', default: true}).evaluate([
+    const result = new Flag({short: 'a', default: true})['evaluate']([
       {
         type: 'short',
         value: 'a',

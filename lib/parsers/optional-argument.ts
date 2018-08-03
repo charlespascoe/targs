@@ -41,10 +41,10 @@ export class OptionalArgument<T> extends Optional<T> {
 
     const optionToken = optionTokens[0];
 
-    if (optionToken.argument !== null) {
+    if (optionToken.value !== null) {
       return {
         newTokens: tokens.filter(token => token !== optionToken),
-        value: this.parseValue(optionToken.argument)
+        value: this.parseValue(optionToken.value)
       };
     }
 
@@ -52,13 +52,13 @@ export class OptionalArgument<T> extends Optional<T> {
 
     const argumentToken = tokens[optionTokenIndex + 1];
 
-    if ((optionTokenIndex + 1) === tokens.length || argumentToken.type !== 'arg') {
+    if ((optionTokenIndex + 1) === tokens.length || argumentToken.type !== 'positional') {
       throw new Error(`${this.getShortLongOptions()} requires an argument`);
     }
 
     return {
       newTokens: tokens.filter(token => token !== optionToken && token !== argumentToken),
-      value: this.parseValue(argumentToken.argument)
+      value: this.parseValue(argumentToken.value)
     };
   }
 

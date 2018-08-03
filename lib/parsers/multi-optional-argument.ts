@@ -41,11 +41,11 @@ export class MultiOptionalArgument<T> extends Optional<T[]> {
 
         const nextToken = newTokens[i + 1];
 
-        if (nextToken.type !== 'arg') {
+        if (nextToken.type !== 'positional') {
           throw new Error(`${this.getShortLongOptions()} requires an argument`);
         }
 
-        result.unshift(this.parseValue(nextToken.argument));
+        result.unshift(this.parseValue(nextToken.value));
         newTokens.splice(i, 2);
       }
     }

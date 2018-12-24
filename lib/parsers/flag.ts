@@ -1,51 +1,62 @@
-import { Token, ShortOptionToken, LongOptionToken } from '../tokens';
-import { IEvaluatedArgument } from './argument';
-import { Optional, IOptionalOptions } from './optional';
+import { ArgumentParser, Read } from './argument-parser';
+import { matchesToken } from '../tokens';
+import { formatOptions, formatOptionsHint } from '../formatting';
+import { Result, success, error } from '../result';
 
 
-export interface IFlagOptions extends IOptionalOptions<boolean> {
-  default?: boolean;
+export interface FlagOptions {
+  shortName?: string;
+  longName?: string;
+  defaultValue?: boolean;
+  description?: string;
 }
 
 
-export class Flag extends Optional<boolean> {
-  public readonly default: boolean = false;
+export interface Flag extends ArgumentParser<boolean,number> { }
 
-  constructor(options: IFlagOptions) {
-    super(options);
 
-    if (typeof options.default === 'boolean') {
-      this.default = options.default;
-    }
+export function flag(options: FlagOptions): Flag {
+  const {
+    shortName = null,
+    longName = null,
+    defaultValue = false,
+    description = ''
+  } = options;
+
+  if (shortName === null && longName === null) {
+    throw new Error('At least one of shortName or longName must be defined');
   }
 
-  protected evaluate(tokens: Token[]): IEvaluatedArgument<boolean> {
-    const flagTokens = tokens.filter((token): token is ShortOptionToken | LongOptionToken => token.type === 'short' && token.value === this.short || token.type === 'long' && token.value === this.long);
+  const read: Read<number> = (count, tokens) => {
+    if (tokens.length > 0) {
+      const head = tokens[0];
 
-    if (flagTokens.length === 0) {
-      return {
-        newTokens: tokens,
-        value: this.default
-      };
+      if (matchesToken(head, shortName, longName)) {
+        return {newValue: count + 1, newTokens: tokens.slice(1)};
+      }
     }
 
-    if (flagTokens.length > 1) {
-      throw new Error(`Cannot set ${this.getShortLongOptions()} flag multiple times`);
+    return null;
+  };
+
+  const coerce = (count: number): Result<boolean> => {
+    if (count === 0) {
+      return success(defaultValue);
     }
 
-    const flagToken = flagTokens[0];
-
-    if (flagToken.argument !== null) {
-      throw new Error(`Do not provide an argument for the ${this.getShortLongOptions()} flag`)
+    if (count === 1) {
+      return success(!defaultValue);
     }
 
-    return {
-      newTokens: tokens.filter(token => token !== flagToken),
-      value: !this.default
-    };
+    return error(`Can't set ${formatOptions(shortName, longName)} flag more than once`);
   }
 
-  public getUsageExample() {
-    return `[${this.getUsageExampleOption()}]`;
-  }
+  return {
+    initial: 0,
+    read,
+    coerce,
+
+    hintPrefix: formatOptionsHint(shortName, longName),
+    description
+  };
 }

@@ -27,16 +27,21 @@ export interface PositionalToken {
 export type Token = ShortOptionToken | LongOptionToken | PositionalToken;
 
 
-interface TokenParseSuccess {
+export interface TokenParseSuccess {
   success: true;
   tokens: Token[];
 }
 
-interface TokenParseFailure {
+export interface TokenParseFailure {
   success: false;
   message: string;
   args: string[];
   index: number;
+}
+
+
+export function matchesToken(token: Token, shortName: string | null, longName: string | null): boolean {
+  return (token.type === 'short' && token.value === shortName) || (token.type === 'long' && token.value === longName);
 }
 
 

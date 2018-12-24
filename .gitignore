@@ -62,3 +62,4 @@ package-lock.json
 
 # Ignore dist
 /dist/
+old/

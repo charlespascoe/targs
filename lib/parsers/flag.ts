@@ -15,6 +15,12 @@ export interface FlagOptions {
 export interface Flag extends ArgumentParser<boolean,number> { }
 
 
+export function nonPosArgSuggestions(partialToken: string, shortName: string | null, longName: string | null): string[] {
+  return (shortName !== null && partialToken === '-' ? [`-${shortName}`] : [])
+    .concat(longName !== null && `--${longName}`.startsWith(partialToken) ? [`--${longName}`] : []);
+}
+
+
 export function flag(options: FlagOptions): Flag {
   const {
     shortName = null,
@@ -57,6 +63,7 @@ export function flag(options: FlagOptions): Flag {
     coerce,
 
     hintPrefix: formatOptionsHint(shortName, longName),
-    description
+    description,
+    suggestCompletion: (preceedingTokens, partialToken) => nonPosArgSuggestions(partialToken, shortName, longName)
   };
 }

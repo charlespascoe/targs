@@ -1,6 +1,6 @@
-import { initState, coerceState, parseRec, parse } from '../../lib/parsers/parser';
+import { initState, coerceState, parseArgumentGroup, parse } from '../../lib/parsers/parser';
 import { success, error } from '../../lib/result';
-import { ArgumentParser, ArgumentParsers } from '../../lib/parsers/argument-parser';
+import { ArgumentParser, ArgumentParserGroup } from '../../lib/parsers/argument-parser';
 import { expect } from 'chai';
 import 'mocha';
 
@@ -112,7 +112,7 @@ describe('parsers/parser', () => {
 
   });
 
-  describe('parseRec', () => {
+  describe('parseArgumentGroup', () => {
 
     it('should return the given state if no tokens are provided', () => {
       const fooArgParser: ArgumentParser<number,number> = {
@@ -125,7 +125,7 @@ describe('parsers/parser', () => {
         suggestCompletion: () => []
       };
 
-      const result = parseRec({foo: 456}, [], {foo: fooArgParser});
+      const result = parseArgumentGroup({foo: 456}, [], {foo: fooArgParser});
 
       expect(result).to.deep.equal({
         finalState: {
@@ -146,7 +146,7 @@ describe('parsers/parser', () => {
         suggestCompletion: () => []
       };
 
-      const result = parseRec({foo: 456}, [{type: 'short', value: 'x', argument: null}], {foo: fooArgParser});
+      const result = parseArgumentGroup({foo: 456}, [{type: 'short', value: 'x', argument: null}], {foo: fooArgParser});
 
       expect(result).to.deep.equal({
         finalState: {
@@ -165,7 +165,7 @@ describe('parsers/parser', () => {
     it('should invoke read on the appropriate parser', () => {
       const fooArgParser: ArgumentParser<number,number> = {
         initial: 123,
-        read: (acc, tokens) => ({newValue: acc + 1, newTokens: []}),
+        read: (acc, tokens) => ({newState: acc + 1, newTokens: []}),
         coerce: (x: number) => success(x),
 
         hintPrefix: '',
@@ -173,7 +173,7 @@ describe('parsers/parser', () => {
         suggestCompletion: () => []
       };
 
-      const result = parseRec({foo: 456}, [{type: 'short', value: 'x', argument: null}], {foo: fooArgParser});
+      const result = parseArgumentGroup({foo: 456}, [{type: 'short', value: 'x', argument: null}], {foo: fooArgParser});
 
       expect(result).to.deep.equal({
         finalState: {
@@ -209,7 +209,7 @@ describe('parsers/parser', () => {
     it('should return the correct value when there are no errors', () => {
       const fooArgParser: ArgumentParser<number,number> = {
         initial: 123,
-        read: (acc, tokens) => ({newValue: 456, newTokens: []}),
+        read: (acc, tokens) => ({newState: 456, newTokens: []}),
         coerce: (x: number) => success(x + 1),
 
         hintPrefix: '',

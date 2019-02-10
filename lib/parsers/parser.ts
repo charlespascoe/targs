@@ -1,25 +1,25 @@
 import { Token } from '../tokens';
-import { ArgumentParsers } from './argument-parser';
+import { ArgumentParserGroup } from './argument-parser';
 import { keysOf } from '../utils';
 import { Result, success, error } from '../result';
 
 
-export function initState<T,A extends {[K in keyof T]: any}>(argParsers: ArgumentParsers<T,A>): A {
-  const result: Partial<A> = {};
+export function initState<T,S extends {[K in keyof T]: any}>(argGroup: ArgumentParserGroup<T,S>): S {
+  const result: Partial<S> = {};
 
-  for (const key in argParsers) {
-    result[key] = argParsers[key].initial;
+  for (const key in argGroup) {
+    result[key] = argGroup[key].initial;
   }
 
-  return result as A;
+  return result as S;
 }
 
 
-export function coerceState<T,A extends {[K in keyof T]: any}>(state: A, argParsers: ArgumentParsers<T,A>): Result<T> {
+export function coerceState<T,S extends {[K in keyof T]: any}>(state: S, argGroup: ArgumentParserGroup<T,S>): Result<T> {
   const result: Partial<T> = {};
 
-  for (const key in argParsers) {
-    const coerceResult = argParsers[key].coerce(state[key]);
+  for (const key in argGroup) {
+    const coerceResult = argGroup[key].coerce(state[key]);
 
     if (!coerceResult.success) {
       return coerceResult;
@@ -32,19 +32,18 @@ export function coerceState<T,A extends {[K in keyof T]: any}>(state: A, argPars
 }
 
 
-// TODO: Come up with a better name
-export function parseRec<T,A extends {[K in keyof T]: any}>(state: A, tokens: Token[], argParsers: ArgumentParsers<T,A>): {finalState: A, newTokens: Token[]} {
+export function parseArgumentGroup<T,A extends {[K in keyof T]: any}>(state: A, tokens: Token[], argGroup: ArgumentParserGroup<T,A>): {finalState: A, newTokens: Token[]} {
   if (tokens.length === 0) {
     return {finalState: state, newTokens: tokens};
   }
 
-  for (const key in argParsers) {
-    const result = argParsers[key].read(state[key], tokens);
+  for (const key in argGroup) {
+    const result = argGroup[key].read(state[key], tokens);
 
     if (result !== null) {
-      const { newValue, newTokens } = result;
+      const { newState, newTokens } = result;
 
-      return parseRec(Object.assign({}, state, {[key]: newValue}), newTokens, argParsers);
+      return parseArgumentGroup(Object.assign({}, state, {[key]: newState}), newTokens, argGroup);
     }
   }
 
@@ -52,12 +51,12 @@ export function parseRec<T,A extends {[K in keyof T]: any}>(state: A, tokens: To
 }
 
 
-export function parse<T,A extends {[K in keyof T]: any}>(tokens: Token[], argParsers: ArgumentParsers<T,A>): Result<{value: T, tokens: Token[]}>  {
-  const initialState = initState(argParsers);
+export function parse<T,A extends {[K in keyof T]: any}>(tokens: Token[], argGroup: ArgumentParserGroup<T,A>): Result<{value: T, tokens: Token[]}>  {
+  const initialState = initState(argGroup);
 
-  const { finalState, newTokens } = parseRec(initialState, tokens, argParsers);
+  const { finalState, newTokens } = parseArgumentGroup(initialState, tokens, argGroup);
 
-  const result = coerceState(finalState, argParsers);
+  const result = coerceState(finalState, argGroup);
 
   if (!result.success) {
     return result;
@@ -70,8 +69,8 @@ export function parse<T,A extends {[K in keyof T]: any}>(tokens: Token[], argPar
 }
 
 
-export function suggestCompletion<T,A extends {[K in keyof T]: any}>(argParsers: ArgumentParsers<T,A>, preceedingTokens: Token[], partialToken: string): string [] {
-  return keysOf(argParsers)
-    .map(key => argParsers[key].suggestCompletion(preceedingTokens, partialToken))
+export function suggestCompletion<T,A extends {[K in keyof T]: any}>(argGroup: ArgumentParserGroup<T,A>, preceedingTokens: Token[], partialToken: string): string[] {
+  return keysOf(argGroup)
+    .map(key => argGroup[key].suggestCompletion(preceedingTokens, partialToken))
     .reduce((allSuggestions, suggestions) => allSuggestions.concat(suggestions));
 }

@@ -46,7 +46,7 @@ describe('parsers/flag', () => {
             {type: 'short', value: 'f', argument: null}
           ]
         )
-      ).to.deep.equal({newValue: 4, newTokens: []});
+      ).to.deep.equal({newState: 4, newTokens: []});
     });
 
   });

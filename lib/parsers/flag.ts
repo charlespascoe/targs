@@ -38,7 +38,7 @@ export function flag(options: FlagOptions): Flag {
       const head = tokens[0];
 
       if (matchesToken(head, shortName, longName)) {
-        return {newValue: count + 1, newTokens: tokens.slice(1)};
+        return {newState: count + 1, newTokens: tokens.slice(1)};
       }
     }
 

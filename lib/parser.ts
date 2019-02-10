@@ -1,7 +1,7 @@
-import { Token } from '../tokens';
-import { ArgumentParserGroup } from './argument-parser';
-import { keysOf } from '../utils';
-import { Result, success, error } from '../result';
+import { Token } from './tokens';
+import { ArgumentParserGroup } from './parsers/argument-parser';
+import { keysOf } from './utils';
+import { Result, success, error } from './result';
 
 
 export function initState<T,S extends {[K in keyof T]: any}>(argGroup: ArgumentParserGroup<T,S>): S {

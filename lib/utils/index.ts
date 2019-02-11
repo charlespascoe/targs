@@ -11,6 +11,10 @@ export function without<T>(items: T[], withoutItems: T[]): T[] {
 export function keysOf<T extends object>(arg: T): Array<keyof T> {
   const keys: Array<keyof T> = [];
 
+  for (const sym of Object.getOwnPropertySymbols(arg)) {
+    keys.push(sym as keyof T);
+  }
+
   for (const key in arg) {
     keys.push(key);
   }
@@ -20,13 +24,7 @@ export function keysOf<T extends object>(arg: T): Array<keyof T> {
 
 
 export function values<T extends {}>(obj: T): Array<T[keyof T]> {
-  const values: Array<T[keyof T]> = [];
-
-  for (const key in obj) {
-    values.push(obj[key]);
-  }
-
-  return values;
+  return keysOf(obj).map(key => obj[key]);
 }
 
 

@@ -7,7 +7,7 @@ import { Result, success, error } from './result';
 export function initState<T,S extends {[K in keyof T]: any}>(argGroup: ArgumentParserGroup<T,S>): S {
   const result: Partial<S> = {};
 
-  for (const key in argGroup) {
+  for (const key of keysOf(argGroup)) {
     result[key] = argGroup[key].initial;
   }
 
@@ -18,7 +18,7 @@ export function initState<T,S extends {[K in keyof T]: any}>(argGroup: ArgumentP
 export function coerceState<T,S extends {[K in keyof T]: any}>(state: S, argGroup: ArgumentParserGroup<T,S>): Result<T> {
   const result: Partial<T> = {};
 
-  for (const key in argGroup) {
+  for (const key of keysOf(argGroup)) {
     const coerceResult = argGroup[key].coerce(state[key]);
 
     if (!coerceResult.success) {
@@ -37,7 +37,7 @@ export function parseArgumentGroup<T,A extends {[K in keyof T]: any}>(state: A, 
     return {finalState: state, newTokens: tokens};
   }
 
-  for (const key in argGroup) {
+  for (const key of keysOf(argGroup)) {
     const result = argGroup[key].read(state[key], tokens);
 
     if (result !== null) {

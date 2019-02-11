@@ -1,5 +1,6 @@
 import { Token } from '../tokens';
 import { Result } from '../result';
+import { entries } from '../utils';
 
 
 /**
@@ -63,3 +64,20 @@ export type NonPositionalArgumentParser<T,S> = TokenParser<T,S> & ArgumentDocume
 export type ArgumentParserGroup<T=any, A extends {[K in keyof T]: any}=any> = {[K in keyof T]: ArgumentParser<T[K], A[K]>};
 
 export type NonPositionalArgumentParserGroup<T=any, A extends {[K in keyof T]: any}=any> = {[K in keyof T]: NonPositionalArgumentParser<T[K], A[K]>};
+
+
+export function mergeArgumentParsers<T,U,A extends {[K in keyof T]: any},B extends {[K in keyof U]: any}>(argGroup1: ArgumentParserGroup<T,A>, argGroup2: ArgumentParserGroup<U,B>): ArgumentParserGroup<T & U, any>  {
+  const result: any = {};
+
+  entries(argGroup1, (key, argParser) => ({key, argParser}))
+    .forEach(({key, argParser}) => {
+      result[key] = argParser
+    });
+
+  entries(argGroup2, (key, argParser) => ({key, argParser}))
+    .forEach(({key, argParser}) => {
+      result[key] = argParser
+    });
+
+  return result as ArgumentParserGroup<T & U, any>;
+}

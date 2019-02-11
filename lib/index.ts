@@ -45,5 +45,4 @@ const bar = p.subcommand(
 ).action((args) => console.log(args));
 
 
-//p.execute(process.argv.slice(2));
-bar.printHelp();
+p.execute(process.argv.slice(2));

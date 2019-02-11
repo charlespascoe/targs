@@ -1,29 +1,59 @@
-import { ArgumentParserGroup } from './parsers/argument-parser';
+import { ArgumentParserGroup, mergeArgumentParsers } from './parsers/argument-parser';
 import { tokeniseArguments, Token } from './tokens';
 import { parse } from './parser';
 import { values, programName, screenWidth } from './utils';
 import { formatEntry } from './utils/strings';
 import { generateHelp } from './help';
+import { flag, Flag } from './parsers/flag';
 
 
-export function parser<T>(argGroup: ArgumentParserGroup<T,any>): RootParser<T> {
-  return new RootParser(argGroup, {programName, screenWidth});
+const help = Symbol('help');
+
+
+function removeHelp<T>(args: T & {[help]: boolean}): T {
+  const newArgs = Object.assign({}, args);
+  delete newArgs[help];
+  return newArgs as T;
+}
+
+
+export function parser<T>(argGroup: ArgumentParserGroup<T,any>, options: Partial<ParserOptions> = {}): RootParser<T> {
+  return new RootParser(
+    argGroup,
+    {
+      programName,
+      screenWidth,
+      helpFlag: flag({
+        shortName: 'h',
+        longName: 'help',
+        description: 'Prints help and quits'
+      }),
+      ...options
+    }
+  );
 }
 
 
 export interface ParserOptions {
   programName: string;
   screenWidth: number;
+  helpFlag: Flag;
 }
 
 
 export class RootParser<T> {
   private readonly subcommandSwitch: SubcommandSwitch<T>;
+  private readonly argGroup: ArgumentParserGroup<T & {[help]: boolean}>;
 
   constructor(
-    private readonly argGroup: ArgumentParserGroup<T>,
+    argGroup: ArgumentParserGroup<T>,
     private readonly options: ParserOptions
   ) {
+    this.argGroup = mergeArgumentParsers(
+      {[help]: this.options.helpFlag},
+      argGroup
+    );
+
     this.subcommandSwitch = new SubcommandSwitch(() => this.printHelp(), options);
   }
 
@@ -49,7 +79,12 @@ export class RootParser<T> {
 
     const { args, tokens: newTokens } = parseResult.value;
 
-    this.subcommandSwitch.execute(args, newTokens);
+    if (args[help]) {
+      this.printHelp();
+      return;
+    }
+
+    this.subcommandSwitch.execute(removeHelp(args), newTokens);
   }
 
   subcommand<U>(cmd: string, description: string, args: ArgumentParserGroup<U,any>): Subcommand<T,U> {
@@ -151,16 +186,25 @@ export interface Next<T> {
 
 export class Subcommand<T,U> {
   private next: Next<T & U> | SubcommandSwitch<T & U> | null = null;
+  private readonly argGroup: ArgumentParserGroup<U & {[help]: boolean},any>;
 
   constructor(
     public readonly command: string,
     public readonly description: string,
-    private readonly argGroup: ArgumentParserGroup<U,any>,
+    argGroup: ArgumentParserGroup<U,any>,
     private readonly parserOptions: ParserOptions
-  ) { }
+  ) {
+    this.argGroup = mergeArgumentParsers(
+      {[help]: this.parserOptions.helpFlag},
+      argGroup
+    );
+  }
 
   execute(args: T, tokens: Token[]): void {
-    const parseResult = parse(tokens, this.argGroup);
+    const parseResult = parse(
+      tokens,
+      this.argGroup
+    );
 
     if (!parseResult.success) {
       console.log(parseResult.message);
@@ -170,11 +214,16 @@ export class Subcommand<T,U> {
 
     const { args: newArgs, tokens: newTokens } = parseResult.value;
 
+    if (newArgs[help]) {
+      this.printHelp();
+      return;
+    }
+
     if (this.next === null) {
       throw new Error('A subcommand needs either an action or a subcommand parsers');
     }
 
-    this.next.execute(Object.assign({}, args, newArgs), newTokens);
+    this.next.execute(Object.assign({}, args, removeHelp(newArgs)), newTokens);
   }
 
   subcommandParser(): SubcommandSwitch<T & U> {

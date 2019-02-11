@@ -51,7 +51,7 @@ export function parseArgumentGroup<T,A extends {[K in keyof T]: any}>(state: A, 
 }
 
 
-export function parse<T,A extends {[K in keyof T]: any}>(tokens: Token[], argGroup: ArgumentParserGroup<T,A>): Result<{value: T, tokens: Token[]}>  {
+export function parse<T,A extends {[K in keyof T]: any}>(tokens: Token[], argGroup: ArgumentParserGroup<T,A>): Result<{args: T, tokens: Token[]}>  {
   const initialState = initState(argGroup);
 
   const { finalState, newTokens } = parseArgumentGroup(initialState, tokens, argGroup);
@@ -63,7 +63,7 @@ export function parse<T,A extends {[K in keyof T]: any}>(tokens: Token[], argGro
   }
 
   return success({
-    value: result.value,
+    args: result.value,
     tokens: newTokens
   });
 }

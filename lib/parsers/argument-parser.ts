@@ -9,7 +9,31 @@ import { Result } from '../result';
 export type Read<S> = (state: S, tokens: Token[]) => {newState: S, newTokens: Token[]} | null;
 
 
-export interface ArgumentParser<T,S> {
+export interface ArgumentDocumentation {
+  /**
+   * The hint to show in the first line of help
+   */
+  shortHint: string;
+
+  /**
+   * The prefix to show before the description when printing help
+   */
+  hintPrefix: string;
+
+  /**
+   * The description of this argument
+   */
+  description: string;
+}
+
+
+export interface NonPositionalArgument {
+  shortName: string | null;
+  longName: string | null;
+}
+
+
+export interface TokenParser<T,S> {
   /**
    * The initial parsing state for this argument
    */
@@ -26,32 +50,16 @@ export interface ArgumentParser<T,S> {
    */
   coerce: (state: S) => Result<T>;
 
-  // Documentation //
-
-  /**
-   * The prefix to show before the description when printing help
-   */
-  hintPrefix: string;
-
-  /**
-   * The description of this argument
-   */
-  description: string;
-
   /**
    * Returns a list of autocomplete suggestions for a partial token
    */
   suggestCompletion: (preceedingTokens: Token[], partialToken: string) => string[];
 }
 
-
-export interface NonPositionalArgumentParser<T,A> extends ArgumentParser<T,A> {
-  shortName: string | null;
-  longName: string | null;
-}
+export type ArgumentParser<T,S> = TokenParser<T,S> & ArgumentDocumentation;
+export type NonPositionalArgumentParser<T,S> = TokenParser<T,S> & ArgumentDocumentation & NonPositionalArgument;
 
 
-export type ArgumentParserGroup<T, A extends {[K in keyof T]: any}> = {[K in keyof T]: ArgumentParser<T[K], A[K]>};
+export type ArgumentParserGroup<T=any, A extends {[K in keyof T]: any}=any> = {[K in keyof T]: ArgumentParser<T[K], A[K]>};
 
-
-export type NonPositionalArgumentParserGroup<T, A extends {[K in keyof T]: any}> = {[K in keyof T]: NonPositionalArgumentParser<T[K], A[K]>};
+export type NonPositionalArgumentParserGroup<T=any, A extends {[K in keyof T]: any}=any> = {[K in keyof T]: NonPositionalArgumentParser<T[K], A[K]>};

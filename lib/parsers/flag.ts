@@ -1,6 +1,6 @@
-import { ArgumentParser, Read } from './argument-parser';
+import { NonPositionalArgumentParser, Read } from './argument-parser';
 import { matchesToken } from '../tokens';
-import { formatOptions, formatOptionsHint } from '../formatting';
+import { formatOptions, formatOptionsHint } from '../help';
 import { Result, success, error } from '../result';
 
 
@@ -12,7 +12,7 @@ export interface FlagOptions {
 }
 
 
-export interface Flag extends ArgumentParser<boolean,number> { }
+export interface Flag extends NonPositionalArgumentParser<boolean,number> { }
 
 
 export function nonPosArgSuggestions(partialToken: string, shortName: string | null, longName: string | null): string[] {
@@ -62,8 +62,12 @@ export function flag(options: FlagOptions): Flag {
     read,
     coerce,
 
+    shortHint: shortName !== null ? `[-${shortName}]` : `[--${longName}]`,
     hintPrefix: formatOptionsHint(shortName, longName),
     description,
-    suggestCompletion: (preceedingTokens, partialToken) => nonPosArgSuggestions(partialToken, shortName, longName)
+    suggestCompletion: (preceedingTokens, partialToken) => nonPosArgSuggestions(partialToken, shortName, longName),
+
+    shortName,
+    longName
   };
 }

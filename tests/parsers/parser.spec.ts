@@ -1,8 +1,20 @@
 import { initState, coerceState, parseArgumentGroup, parse } from '../../lib/parser';
 import { success, error } from '../../lib/result';
-import { ArgumentParser, ArgumentParserGroup } from '../../lib/parsers/argument-parser';
+import { ArgumentParser, ArgumentParserGroup, TokenParser } from '../../lib/parsers/argument-parser';
 import { expect } from 'chai';
 import 'mocha';
+
+
+function dummyArgumentParser<T,S>(argParser: TokenParser<T,S>): ArgumentParser<T,S> {
+  return {
+    shortHint: '',
+    hintPrefix: '',
+    description: '',
+    suggestCompletion: () => [],
+
+    ...argParser
+  };
+}
 
 
 describe('parsers/parser', () => {
@@ -10,25 +22,19 @@ describe('parsers/parser', () => {
   describe('initState', () => {
 
     it('should return the initial state object', () => {
-      const fooArgParser: ArgumentParser<number,number> = {
+      const fooArgParser: ArgumentParser<number,number> = dummyArgumentParser<number,number>({
         initial: 123,
         read: (acc, tokens) => null,
         coerce: (x: number) => success(x),
-
-        hintPrefix: '',
-        description: '',
         suggestCompletion: () => []
-      };
+      });
 
-      const barArgParser: ArgumentParser<string,string> = {
+      const barArgParser: ArgumentParser<string,string> = dummyArgumentParser({
         initial: 'Hello, World',
         read: (acc, tokens) => null,
         coerce: (x: string) => success(x),
-
-        hintPrefix: '',
-        description: '',
         suggestCompletion: () => []
-      };
+      });
 
 
       const state = initState({
@@ -44,25 +50,19 @@ describe('parsers/parser', () => {
   describe('coerceState', () => {
 
     it('should return the first coercion error', () => {
-      const fooArgParser: ArgumentParser<number,number> = {
+      const fooArgParser: ArgumentParser<number,number> = dummyArgumentParser({
         initial: 123,
         read: (acc, tokens) => null,
         coerce: (x: number) => error('Foo invalid'),
-
-        hintPrefix: '',
-        description: '',
         suggestCompletion: () => []
-      };
+      });
 
-      const barArgParser: ArgumentParser<string,string> = {
+      const barArgParser: ArgumentParser<string,string> = dummyArgumentParser({
         initial: 'Hello, World',
         read: (acc, tokens) => null,
         coerce: (x: string) => success(x),
-
-        hintPrefix: '',
-        description: '',
         suggestCompletion: () => []
-      };
+      });
 
       const result = coerceState(
         {foo: 456, bar: 'Test'},
@@ -76,25 +76,19 @@ describe('parsers/parser', () => {
     });
 
     it('should return the correct result if there are no errors', () => {
-      const fooArgParser: ArgumentParser<number,number> = {
+      const fooArgParser: ArgumentParser<number,number> = dummyArgumentParser({
         initial: 123,
         read: (acc, tokens) => null,
         coerce: (x: number) => success(x * 2),
-
-        hintPrefix: '',
-        description: '',
         suggestCompletion: () => []
-      };
+      });
 
-      const barArgParser: ArgumentParser<string,string> = {
+      const barArgParser: ArgumentParser<string,string> = dummyArgumentParser({
         initial: 'Hello, World',
         read: (acc, tokens) => null,
         coerce: (x: string) => success(x),
-
-        hintPrefix: '',
-        description: '',
         suggestCompletion: () => []
-      };
+      });
 
       const result = coerceState(
         {foo: 456, bar: 'Test'},
@@ -115,15 +109,12 @@ describe('parsers/parser', () => {
   describe('parseArgumentGroup', () => {
 
     it('should return the given state if no tokens are provided', () => {
-      const fooArgParser: ArgumentParser<number,number> = {
+      const fooArgParser: ArgumentParser<number,number> = dummyArgumentParser({
         initial: 123,
         read: (acc, tokens) => null,
         coerce: (x: number) => success(x),
-
-        hintPrefix: '',
-        description: '',
         suggestCompletion: () => []
-      };
+      });
 
       const result = parseArgumentGroup({foo: 456}, [], {foo: fooArgParser});
 
@@ -136,15 +127,12 @@ describe('parsers/parser', () => {
     });
 
     it('should return the given state if no parsers handle the next token', () => {
-      const fooArgParser: ArgumentParser<number,number> = {
+      const fooArgParser: ArgumentParser<number,number> = dummyArgumentParser({
         initial: 123,
         read: (acc, tokens) => null,
         coerce: (x: number) => success(x),
-
-        hintPrefix: '',
-        description: '',
         suggestCompletion: () => []
-      };
+      });
 
       const result = parseArgumentGroup({foo: 456}, [{type: 'short', value: 'x', argument: null}], {foo: fooArgParser});
 
@@ -163,15 +151,12 @@ describe('parsers/parser', () => {
     });
 
     it('should invoke read on the appropriate parser', () => {
-      const fooArgParser: ArgumentParser<number,number> = {
+      const fooArgParser: ArgumentParser<number,number> = dummyArgumentParser({
         initial: 123,
         read: (acc, tokens) => ({newState: acc + 1, newTokens: []}),
         coerce: (x: number) => success(x),
-
-        hintPrefix: '',
-        description: '',
         suggestCompletion: () => []
-      };
+      });
 
       const result = parseArgumentGroup({foo: 456}, [{type: 'short', value: 'x', argument: null}], {foo: fooArgParser});
 
@@ -188,15 +173,12 @@ describe('parsers/parser', () => {
   describe('parse', () => {
 
     it('should return the first state coercion error', () => {
-      const fooArgParser: ArgumentParser<number,number> = {
+      const fooArgParser: ArgumentParser<number,number> = dummyArgumentParser({
         initial: 123,
         read: (acc, tokens) => null,
         coerce: (x: number) => error('Foo invalid'),
-
-        hintPrefix: '',
-        description: '',
         suggestCompletion: () => []
-      };
+      });
 
       const result = parse([], {foo: fooArgParser});
 
@@ -207,15 +189,12 @@ describe('parsers/parser', () => {
     });
 
     it('should return the correct value when there are no errors', () => {
-      const fooArgParser: ArgumentParser<number,number> = {
+      const fooArgParser: ArgumentParser<number,number> = dummyArgumentParser({
         initial: 123,
         read: (acc, tokens) => ({newState: 456, newTokens: []}),
         coerce: (x: number) => success(x + 1),
-
-        hintPrefix: '',
-        description: '',
         suggestCompletion: () => []
-      };
+      });
 
       const result = parse([{type: 'short', value: 'x', argument: null}], {foo: fooArgParser});
 
@@ -223,7 +202,7 @@ describe('parsers/parser', () => {
         success: true,
         value: {
           tokens: [],
-          value: {
+          args: {
             foo: 457
           }
         }

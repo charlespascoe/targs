@@ -6,7 +6,7 @@ import {
   NonPositionalArgumentParser
 } from './parsers/argument-parser';
 import { values } from './utils';
-import { SubcommandSwitch } from './subcommands';
+import { SubcommandParser } from './subcommands';
 import { formatEntry } from './utils/strings';
 
 
@@ -95,7 +95,7 @@ export function formatOptionsHint(shortName: string | null, longName: string | n
   );
 }
 
-export function generateHelp(programName: string, argParsers: ArgumentParser<any,any>[], subcommandParser: SubcommandSwitch<any> | null, screenWidth: number): string {
+export function generateHelp(programName: string, argParsers: ArgumentParser<any,any>[], subcommandParser: SubcommandParser<any> | null, screenWidth: number): string {
   const longestHintLength = argParsers
     .map(argParser => argParser.hintPrefix.length)
     .reduce((longest, length) => Math.max(longest, length), 0);

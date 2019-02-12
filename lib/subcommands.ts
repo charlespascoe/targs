@@ -42,7 +42,7 @@ export interface ParserOptions {
 
 
 export class RootParser<T> {
-  private readonly subcommandSwitch: SubcommandSwitch<T>;
+  private readonly subcommandParser: SubcommandParser<T>;
   private readonly argGroup: ArgumentParserGroup<T & {[help]: boolean}>;
 
   constructor(
@@ -54,7 +54,7 @@ export class RootParser<T> {
       argGroup
     );
 
-    this.subcommandSwitch = new SubcommandSwitch(() => this.printHelp(), options);
+    this.subcommandParser = new SubcommandParser(() => this.printHelp(), options);
   }
 
   execute(stringArgs: string[]): void {
@@ -84,11 +84,11 @@ export class RootParser<T> {
       return;
     }
 
-    this.subcommandSwitch.execute(removeHelp(args), newTokens);
+    this.subcommandParser.execute(removeHelp(args), newTokens);
   }
 
   subcommand<U>(cmd: string, description: string, args: ArgumentParserGroup<U,any>): Subcommand<T,U> {
-    return this.subcommandSwitch.subcommand(cmd, description, args);
+    return this.subcommandParser.subcommand(cmd, description, args);
   }
 
   printHelp() {
@@ -99,7 +99,7 @@ export class RootParser<T> {
     console.log(generateHelp(
       programName,
       argParsers,
-      this.subcommandSwitch,
+      this.subcommandParser,
       screenWidth
     ));
 
@@ -108,7 +108,7 @@ export class RootParser<T> {
 }
 
 
-export class SubcommandSwitch<T> {
+export class SubcommandParser<T> {
   private readonly subcommandMap = new Map<string,Subcommand<T,any>>();
 
   constructor(
@@ -185,7 +185,7 @@ export interface Next<T> {
 }
 
 export class Subcommand<T,U> {
-  private next: Next<T & U> | SubcommandSwitch<T & U> | null = null;
+  private next: Next<T & U> | SubcommandParser<T & U> | null = null;
   private readonly argGroup: ArgumentParserGroup<U & {[help]: boolean},any>;
 
   constructor(
@@ -226,12 +226,12 @@ export class Subcommand<T,U> {
     this.next.execute(Object.assign({}, args, removeHelp(newArgs)), newTokens);
   }
 
-  subcommandParser(): SubcommandSwitch<T & U> {
-    const subcommandSwitch = new SubcommandSwitch<T & U>(() => this.printHelp(), this.parserOptions);
+  subcommandParser(): SubcommandParser<T & U> {
+    const subcommandParser = new SubcommandParser<T & U>(() => this.printHelp(), this.parserOptions);
 
-    this.setNext(subcommandSwitch);
+    this.setNext(subcommandParser);
 
-    return subcommandSwitch;
+    return subcommandParser;
   }
 
   action(action: (args: T) => void): this {
@@ -251,9 +251,9 @@ export class Subcommand<T,U> {
     return this;
   }
 
-  private getSubcommandParser(): SubcommandSwitch<T & U> | null {
-    if (this.next !== null && (this.next as SubcommandSwitch<T & U>).generateHelpText) {
-      return this.next as SubcommandSwitch<T & U>;
+  private getSubcommandParser(): SubcommandParser<T & U> | null {
+    if (this.next !== null && (this.next as SubcommandParser<T & U>).generateHelpText) {
+      return this.next as SubcommandParser<T & U>;
     } else {
       return null;
     }

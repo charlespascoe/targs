@@ -134,7 +134,7 @@ describe('parsers/parser', () => {
         suggestCompletion: () => []
       });
 
-      const result = parseArgumentGroup({foo: 456}, [{type: 'short', value: 'x', argument: null}], {foo: fooArgParser});
+      const result = parseArgumentGroup({foo: 456}, [{type: 'short', value: 'x'}], {foo: fooArgParser});
 
       expect(result).to.deep.equal({
         finalState: {
@@ -143,8 +143,7 @@ describe('parsers/parser', () => {
         newTokens: [
           {
             type: 'short',
-            value: 'x',
-            argument: null
+            value: 'x'
           }
         ]
       });
@@ -158,7 +157,7 @@ describe('parsers/parser', () => {
         suggestCompletion: () => []
       });
 
-      const result = parseArgumentGroup({foo: 456}, [{type: 'short', value: 'x', argument: null}], {foo: fooArgParser});
+      const result = parseArgumentGroup({foo: 456}, [{type: 'short', value: 'x'}], {foo: fooArgParser});
 
       expect(result).to.deep.equal({
         finalState: {
@@ -196,7 +195,7 @@ describe('parsers/parser', () => {
         suggestCompletion: () => []
       });
 
-      const result = parse([{type: 'short', value: 'x', argument: null}], {foo: fooArgParser});
+      const result = parse([{type: 'short', value: 'x'}], {foo: fooArgParser});
 
       expect(result).to.deep.equal({
         success: true,

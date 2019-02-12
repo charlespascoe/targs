@@ -30,7 +30,7 @@ describe('parsers/flag', () => {
         flg.read(
           flg.initial,
           [
-            {type: 'short', value: 'g', argument: null}
+            {type: 'short', value: 'g'}
           ]
         )
       ).to.equal(null);
@@ -43,7 +43,7 @@ describe('parsers/flag', () => {
         flg.read(
           3,
           [
-            {type: 'short', value: 'f', argument: null}
+            {type: 'short', value: 'f'}
           ]
         )
       ).to.deep.equal({newState: 4, newTokens: []});

@@ -7,14 +7,12 @@ export const longOptionRegex = /^--[a-z0-9]+(-[a-z0-9]+)*(=.*)?$/i;
 export interface ShortOptionToken {
   type: 'short';
   value: string;
-  argument: string | null;
 }
 
 
 export interface LongOptionToken {
   type: 'long';
   value: string;
-  argument: string | null;
 }
 
 
@@ -67,53 +65,23 @@ export function tokeniseArguments(args: string[]): TokenParseSuccess | TokenPars
     }
 
     if (shortOptionsRegex.test(val)) {
-      let lastOptionArgument: string | null = null;
-      let shortFlags: string;
-
-      const equalsIndex = val.indexOf('=');
-
-      if (equalsIndex >= 0) {
-        lastOptionArgument = val.substr(equalsIndex + 1);
-        shortFlags = val.substr(1, equalsIndex - 1);
-      } else {
-        shortFlags = val.substr(1);
-      }
-
-      let lastOption: ShortOptionToken | null = null;
+      const shortFlags = val.substr(1);
 
       for (const shortOption of shortFlags.split('')) {
-        lastOption = {
+        tokens.push({
           type: 'short',
-          value: shortOption,
-          argument: null
-        };
-
-        tokens.push(lastOption);
-      }
-
-      if (lastOption !== null) {
-        lastOption.argument = lastOptionArgument;
+          value: shortOption
+        });
       }
 
       continue;
     }
 
     if (longOptionRegex.test(val)) {
-      const equalsIndex = val.indexOf('=');
-
-      if (equalsIndex >= 0) {
-        tokens.push({
-          type: 'long',
-          value: val.substr(2, equalsIndex - 2),
-          argument: val.substr(equalsIndex + 1)
-        });
-      } else {
-        tokens.push({
-          type: 'long',
-          value: val.substr(2),
-          argument: null
-        });
-      }
+      tokens.push({
+        type: 'long',
+        value: val.substr(2),
+      });
 
       continue;
     }

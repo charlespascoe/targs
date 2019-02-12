@@ -39,8 +39,7 @@ describe('tokeniseArguments', () => {
       tokens: [
         {
           type: 'short',
-          value: 'f',
-          argument: null
+          value: 'f'
         }
       ]
     });
@@ -54,8 +53,7 @@ describe('tokeniseArguments', () => {
       tokens: [
         {
           type: 'short',
-          value: '1',
-          argument: null
+          value: '1'
         }
       ]
     });
@@ -69,43 +67,15 @@ describe('tokeniseArguments', () => {
       tokens: [
         {
           type: 'short',
-          value: 'a',
-          argument: null
+          value: 'a'
         },
         {
           type: 'short',
-          value: 'b',
-          argument: null
+          value: 'b'
         },
         {
           type: 'short',
-          value: 'c',
-          argument: null
-        }
-      ]
-    });
-  });
-
-  it('should set arguments to short options with \'=\'', () => {
-    const result = tokeniseArguments(['-abc=test argument']);
-
-    expect(result).to.deep.equal({
-      success: true,
-      tokens: [
-        {
-          type: 'short',
-          value: 'a',
-          argument: null
-        },
-        {
-          type: 'short',
-          value: 'b',
-          argument: null
-        },
-        {
-          type: 'short',
-          value: 'c',
-          argument: 'test argument'
+          value: 'c'
         }
       ]
     });
@@ -119,8 +89,7 @@ describe('tokeniseArguments', () => {
       tokens: [
         {
           type: 'long',
-          value: 'flag',
-          argument: null
+          value: 'flag'
         }
       ]
     });
@@ -134,23 +103,7 @@ describe('tokeniseArguments', () => {
       tokens: [
         {
           type: 'long',
-          value: 'ipv6',
-          argument: null
-        }
-      ]
-    });
-  });
-
-  it('should set arguments to long options with \'=\'', () => {
-    const result = tokeniseArguments(['--option=Another Test Argument']);
-
-    expect(result).to.deep.equal({
-      success: true,
-      tokens: [
-        {
-          type: 'long',
-          value: 'option',
-          argument: 'Another Test Argument'
+          value: 'ipv6'
         }
       ]
     });

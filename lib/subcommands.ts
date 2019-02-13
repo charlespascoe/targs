@@ -17,6 +17,29 @@ function removeHelp<T>(args: T & {[help]: boolean}): T {
 }
 
 
+function suggestCompletionWithSubcommandParser(argGroup: ArgumentParserGroup, tokens: Token[], partialToken: string, subcommandParser: SubcommandParser<any> | null): string[] {
+  const { genSuggestions, newTokens } = suggestCompletion(argGroup, tokens, partialToken);
+
+  const nextPosArgTokenIndex = newTokens.findIndex(token => token.type === 'positional');
+
+  if (subcommandParser === null || nextPosArgTokenIndex < 0) {
+    // No more positional arguments - must be this level
+    return genSuggestions();
+  }
+
+  const nextPosArgToken = newTokens[nextPosArgTokenIndex];
+
+  const subcommand = subcommandParser._getSubcommand(nextPosArgToken.value);
+
+  if (subcommand === null) {
+    // Either unknown positional arg or unknown subcommand - no suggestions
+    return [];
+  }
+
+  return subcommand.suggestCompletion(newTokens.slice(nextPosArgTokenIndex + 1), partialToken);
+}
+
+
 export function parser<T>(argGroup: ArgumentParserGroup<T,any>, options: Partial<ParserOptions> = {}): RootParser<T> {
   return new RootParser(
     argGroup,
@@ -107,25 +130,7 @@ export class RootParser<T> {
   }
 
   suggestCompletion(tokens: Token[], partialToken: string): string[] {
-    const { genSuggestions, newTokens } = suggestCompletion(this.argGroup, tokens, partialToken);
-
-    const nextPosArgTokenIndex = newTokens.findIndex(token => token.type === 'positional');
-
-    if (nextPosArgTokenIndex < 0) {
-      // No more positional arguments - must be this level
-      return genSuggestions();
-    }
-
-    const nextPosArgToken = newTokens[nextPosArgTokenIndex];
-
-    const subcommand = this.subcommandParser._getSubcommand(nextPosArgToken.value);
-
-    if (subcommand === null) {
-      // Either unknown positional arg or unknown subcommand - no suggestions
-      return [];
-    }
-
-    return subcommand.suggestCompletion(newTokens.slice(nextPosArgTokenIndex + 1), partialToken);
+    return suggestCompletionWithSubcommandParser(this.argGroup, tokens, partialToken, this.subcommandParser);
   }
 }
 
@@ -253,27 +258,7 @@ export class Subcommand<T,U> {
   }
 
   suggestCompletion(tokens: Token[], partialToken: string): string[] {
-    const { genSuggestions, newTokens } = suggestCompletion(this.argGroup, tokens, partialToken);
-
-    const nextPosArgTokenIndex = newTokens.findIndex(token => token.type === 'positional');
-
-    const subcommandParser = this.getSubcommandParser();
-
-    if (subcommandParser === null || nextPosArgTokenIndex < 0) {
-      // No more positional arguments - must be this level
-      return genSuggestions();
-    }
-
-    const nextPosArgToken = newTokens[nextPosArgTokenIndex];
-
-    const subcommand = subcommandParser._getSubcommand(nextPosArgToken.value);
-
-    if (subcommand === null) {
-      // Either unknown positional arg or unknown subcommand - no suggestions
-      return [];
-    }
-
-    return subcommand.suggestCompletion(newTokens.slice(nextPosArgTokenIndex + 1), partialToken);
+    return suggestCompletionWithSubcommandParser(this.argGroup, tokens, partialToken, this.getSubcommandParser());
   }
 
   subcommandParser(): SubcommandParser<T & U> {
@@ -332,7 +317,3 @@ export class Subcommand<T,U> {
     }
   }
 }
-
-
-// TODO:
-// - Add description to subcommands

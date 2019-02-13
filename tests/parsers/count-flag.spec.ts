@@ -10,7 +10,7 @@ describe('parsers/count-flag', () => {
     expect(() => countFlag({})).to.throw('At least one of shortName or longName must be defined')
   });
 
-  describe('read', () => {
+  describe('CountFlag.read', () => {
 
     it('should return null if no tokens are given', () => {
       const flg = countFlag({shortName: 'f'});
@@ -51,7 +51,7 @@ describe('parsers/count-flag', () => {
 
   });
 
-  describe('coerce', () => {
+  describe('CountFlag.coerce', () => {
 
     it('should return the count given', () => {
       const flg1 = countFlag({shortName: 'f'});
@@ -61,6 +61,67 @@ describe('parsers/count-flag', () => {
       expect(flg1.coerce(2)).to.deep.equal(success(2));
       expect(flg1.coerce(3)).to.deep.equal(success(3));
       expect(flg1.coerce(4)).to.deep.equal(success(4));
+    });
+
+  });
+
+  describe('CountFlag.suggestCompletion', () => {
+    
+    // Most functionality is already tested by `nonPosArgSuggestions`
+
+    it('should provide suggestions if the flag has already been set', () => {
+      const flg = countFlag({
+        shortName: 'f',
+        longName: 'flag'
+      });
+
+      expect(flg.suggestCompletion([], '-', 1)).to.deep.equal([
+        '-f',
+        '--flag'
+      ]);
+
+      expect(flg.suggestCompletion([], '-', 2)).to.deep.equal([
+        '-f',
+        '--flag'
+      ]);
+    });
+
+    it('should suggest short and long flags when given \'-\' as the partial token', () => {
+      const flg = countFlag({
+        shortName: 'f',
+        longName: 'flag'
+      });
+
+      expect(flg.suggestCompletion([], '-', 0)).to.deep.equal([
+        '-f',
+        '--flag'
+      ]);
+    });
+
+    it('should suggest the long flag when given \'--\' or a long flag prefix as the partial token', () => {
+      const flg = countFlag({
+        shortName: 'f',
+        longName: 'flag'
+      });
+
+      expect(flg.suggestCompletion([], '--', 0)).to.deep.equal([
+        '--flag'
+      ]);
+
+      expect(flg.suggestCompletion([], '--fl', 0)).to.deep.equal([
+        '--flag'
+      ]);
+
+      expect(flg.suggestCompletion([], '--as', 0)).to.deep.equal([]);
+    });
+
+    it('should provide suggestions if the short flag is already present in a composite short flag', () => {
+      const flg = countFlag({
+        shortName: 'f',
+        longName: 'flag'
+      });
+
+      expect(flg.suggestCompletion([], '-abfc', 0)).to.deep.equal(['-abfcf']);
     });
 
   });

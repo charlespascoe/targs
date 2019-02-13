@@ -120,13 +120,14 @@ describe('parsers/flag', () => {
 
     // Most functionality is already tested by `nonPosArgSuggestions`
 
-    it('should not return anything if the flag has already be declared', () => {
+    it('should provide no suggestions if the flag has already been set', () => {
       const flg = flag({
         shortName: 'f',
         longName: 'flag'
       });
 
       expect(flg.suggestCompletion([], '-', 1)).to.deep.equal([]);
+      expect(flg.suggestCompletion([], '-', 2)).to.deep.equal([]);
     });
 
     it('should suggest short and long flags when given \'-\' as the partial token', () => {
@@ -156,16 +157,6 @@ describe('parsers/flag', () => {
       ]);
 
       expect(flg.suggestCompletion([], '--as', 0)).to.deep.equal([]);
-    });
-
-    it('should provide no suggestions if the flag has already been set', () => {
-      const flg = flag({
-        shortName: 'f',
-        longName: 'flag'
-      });
-
-      expect(flg.suggestCompletion([], '-', 1)).to.deep.equal([]);
-      expect(flg.suggestCompletion([], '-', 2)).to.deep.equal([]);
     });
 
     it('should provide no suggestions if the short flag is already present in a composite short flag', () => {

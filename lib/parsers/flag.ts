@@ -1,5 +1,5 @@
-import { NonPositionalArgumentParser, Read } from './argument-parser';
-import { matchesToken } from '../tokens';
+import { NonPositionalArgumentParser, Read, SuggestionCompleter } from './argument-parser';
+import { matchesToken, Token, shortOptionsRegex } from '../tokens';
 import { formatOptions, formatOptionsHint } from '../help';
 import { Result, success, error } from '../result';
 
@@ -15,9 +15,34 @@ export interface FlagOptions {
 export interface Flag extends NonPositionalArgumentParser<boolean,number> { }
 
 
-export function nonPosArgSuggestions(partialToken: string, shortName: string | null, longName: string | null): string[] {
-  return (shortName !== null && partialToken === '-' ? [`-${shortName}`] : [])
-    .concat(longName !== null && `--${longName}`.startsWith(partialToken) ? [`--${longName}`] : []);
+export function nonPosArgSuggestions(partialToken: string, shortName: string | null, longName: string | null, permitMultipleShortOccurences: boolean): string[] {
+  const shortSuggestions = (() => {
+    if (shortName === null) {
+      return [];
+    }
+
+    if (partialToken === '-') {
+      return [`-${shortName}`];
+    } else if (shortOptionsRegex.test(partialToken)) {
+      const shortFlags = new Set(partialToken.slice(1).split(''));
+
+      if (!shortFlags.has(shortName) || permitMultipleShortOccurences) {
+        return [`${partialToken}${shortName}`];
+      }
+    }
+
+    return [];
+  })();
+
+  const longSuggestions = (() => {
+    if (longName !== null && `--${longName}`.startsWith(partialToken)) {
+      return [`--${longName}`];
+    }
+
+    return [];
+  })();
+
+  return shortSuggestions.concat(longSuggestions);
 }
 
 
@@ -55,7 +80,15 @@ export function flag(options: FlagOptions): Flag {
     }
 
     return error(`Can't set ${formatOptions(shortName, longName)} flag more than once`);
-  }
+  };
+
+  const suggestCompletion = (preceedingTokens: Token[], partialToken: string, currentState: number) => {
+    if (currentState > 0) {
+      return [];
+    }
+
+    return nonPosArgSuggestions(partialToken, shortName, longName, false);
+  };
 
   return {
     initial: 0,
@@ -65,7 +98,7 @@ export function flag(options: FlagOptions): Flag {
     shortHint: shortName !== null ? `[-${shortName}]` : `[--${longName}]`,
     hintPrefix: formatOptionsHint(shortName, longName),
     description,
-    suggestCompletion: (preceedingTokens, partialToken) => nonPosArgSuggestions(partialToken, shortName, longName),
+    suggestCompletion,
 
     shortName,
     longName

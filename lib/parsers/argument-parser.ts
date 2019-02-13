@@ -10,6 +10,9 @@ import { entries } from '../utils';
 export type Read<S> = (state: S, tokens: Token[]) => {newState: S, newTokens: Token[]} | null;
 
 
+export type SuggestionCompleter<S> = (preceedingTokens: Token[], partialToken: string, currentState: S) => string[];
+
+
 export interface ArgumentDocumentation {
   /**
    * The hint to show in the first line of help
@@ -54,7 +57,7 @@ export interface TokenParser<T,S> {
   /**
    * Returns a list of autocomplete suggestions for a partial token
    */
-  suggestCompletion: (preceedingTokens: Token[], partialToken: string, currentState: S) => string[];
+  suggestCompletion: SuggestionCompleter<S>;
 }
 
 export type ArgumentParser<T,S> = TokenParser<T,S> & ArgumentDocumentation;

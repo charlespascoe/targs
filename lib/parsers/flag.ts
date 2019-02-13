@@ -79,7 +79,7 @@ export function flag(options: FlagOptions): Flag {
       return success(!defaultValue);
     }
 
-    return error(`Can't set ${formatOptions(shortName, longName)} flag more than once`);
+    return error(`You can't set ${formatOptions(shortName, longName)} flag more than once`);
   };
 
   const suggestCompletion = (preceedingTokens: Token[], partialToken: string, currentState: number) => {

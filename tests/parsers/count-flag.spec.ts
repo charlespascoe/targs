@@ -10,6 +10,12 @@ describe('parsers/count-flag', () => {
     expect(() => countFlag({})).to.throw('At least one of shortName or longName must be defined')
   });
 
+  it('should not allow maxCount to be less than 0', () => {
+    expect(() => countFlag({shortName: 'f', maxCount: -1})).to.throw('countFlag: maxCount must be greater than or equal to 1');
+    expect(() => countFlag({shortName: 'f', maxCount: 0})).to.throw('countFlag: maxCount must be greater than or equal to 1');
+    expect(() => countFlag({shortName: 'f', maxCount: 1})).to.not.throw();
+  });
+
   describe('CountFlag.read', () => {
 
     it('should return null if no tokens are given', () => {
@@ -63,10 +69,20 @@ describe('parsers/count-flag', () => {
       expect(flg1.coerce(4)).to.deep.equal(success(4));
     });
 
+    it('should prevent passing too many flags if maxCount is set', () => {
+      const flg1 = countFlag({shortName: 'f', maxCount: 2});
+
+      expect(flg1.coerce(0)).to.deep.equal(success(0));
+      expect(flg1.coerce(1)).to.deep.equal(success(1));
+      expect(flg1.coerce(2)).to.deep.equal(success(2));
+      expect(flg1.coerce(3)).to.deep.equal(error('You can\'t set -f flag more than 2 times'));
+      expect(flg1.coerce(4)).to.deep.equal(error('You can\'t set -f flag more than 2 times'));
+    });
+
   });
 
   describe('CountFlag.suggestCompletion', () => {
-    
+
     // Most functionality is already tested by `nonPosArgSuggestions`
 
     it('should provide suggestions if the flag has already been set', () => {

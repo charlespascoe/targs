@@ -109,9 +109,9 @@ describe('parsers/flag', () => {
     it('should return an error if greater than 1', () => {
       const flg = flag({shortName: 'f'});
 
-      expect(flg.coerce(2)).to.deep.equal(error('Can\'t set -f flag more than once'));
-      expect(flg.coerce(3)).to.deep.equal(error('Can\'t set -f flag more than once'));
-      expect(flg.coerce(4)).to.deep.equal(error('Can\'t set -f flag more than once'));
+      expect(flg.coerce(2)).to.deep.equal(error('You can\'t set -f flag more than once'));
+      expect(flg.coerce(3)).to.deep.equal(error('You can\'t set -f flag more than once'));
+      expect(flg.coerce(4)).to.deep.equal(error('You can\'t set -f flag more than once'));
     });
 
   });

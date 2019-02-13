@@ -107,13 +107,13 @@ export class RootParser<T> {
   }
 
   suggestCompletion(tokens: Token[], partialToken: string): string[] {
-    const { suggestions, newTokens } = suggestCompletion(this.argGroup, tokens, partialToken);
+    const { genSuggestions, newTokens } = suggestCompletion(this.argGroup, tokens, partialToken);
 
     const nextPosArgTokenIndex = newTokens.findIndex(token => token.type === 'positional');
 
     if (nextPosArgTokenIndex < 0) {
       // No more positional arguments - must be this level
-      return suggestions;
+      return genSuggestions();
     }
 
     const nextPosArgToken = newTokens[nextPosArgTokenIndex];
@@ -253,7 +253,7 @@ export class Subcommand<T,U> {
   }
 
   suggestCompletion(tokens: Token[], partialToken: string): string[] {
-    const { suggestions, newTokens } = suggestCompletion(this.argGroup, tokens, partialToken);
+    const { genSuggestions, newTokens } = suggestCompletion(this.argGroup, tokens, partialToken);
 
     const nextPosArgTokenIndex = newTokens.findIndex(token => token.type === 'positional');
 
@@ -261,7 +261,7 @@ export class Subcommand<T,U> {
 
     if (subcommandParser === null || nextPosArgTokenIndex < 0) {
       // No more positional arguments - must be this level
-      return suggestions;
+      return genSuggestions();
     }
 
     const nextPosArgToken = newTokens[nextPosArgTokenIndex];

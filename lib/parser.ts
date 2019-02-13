@@ -69,12 +69,12 @@ export function parse<T,A extends {[K in keyof T]: any}>(tokens: Token[], argGro
 }
 
 
-export function suggestCompletion<T,A extends {[K in keyof T]: any}>(argGroup: ArgumentParserGroup<T,A>, preceedingTokens: Token[], partialToken: string): { newTokens: Token[], suggestions: string[] } {
+export function suggestCompletion<T,A extends {[K in keyof T]: any}>(argGroup: ArgumentParserGroup<T,A>, preceedingTokens: Token[], partialToken: string): { newTokens: Token[], genSuggestions: () => string[] } {
   const { finalState, newTokens } = parseArgumentGroup(initState(argGroup), preceedingTokens, argGroup);
 
   return {
     newTokens,
-    suggestions: values(zipObjects(argGroup, finalState, (argParser, state) => ({argParser, state})))
+    genSuggestions: () => values(zipObjects(argGroup, finalState, (argParser, state) => ({argParser, state})))
       .map(({argParser, state}) => argParser.suggestCompletion(preceedingTokens, partialToken, state))
       .reduce((suggestions, parserSuggestions) => suggestions.concat(parserSuggestions))
   };

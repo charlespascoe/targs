@@ -1,6 +1,6 @@
-import { initState, coerceState, parseArgumentGroup, parse } from '../../lib/parser';
-import { success, error } from '../../lib/result';
-import { ArgumentParser, ArgumentParserGroup, TokenParser } from '../../lib/parsers/argument-parser';
+import { initState, coerceState, parseArgumentGroup, parse } from '../lib/parser';
+import { success, error } from '../lib/result';
+import { ArgumentParser, ArgumentParserGroup, TokenParser } from '../lib/parsers/argument-parser';
 import { expect } from 'chai';
 import 'mocha';
 
@@ -17,7 +17,7 @@ function dummyArgumentParser<T,S>(argParser: TokenParser<T,S>): ArgumentParser<T
 }
 
 
-describe('parsers/parser', () => {
+describe('parser', () => {
 
   describe('initState', () => {
 

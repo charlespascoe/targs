@@ -54,7 +54,7 @@ export interface TokenParser<T,S> {
   /**
    * Returns a list of autocomplete suggestions for a partial token
    */
-  suggestCompletion: (preceedingTokens: Token[], partialToken: string) => string[];
+  suggestCompletion: (preceedingTokens: Token[], partialToken: string, currentState: S) => string[];
 }
 
 export type ArgumentParser<T,S> = TokenParser<T,S> & ArgumentDocumentation;

@@ -46,6 +46,17 @@ export function zip<A,B,T>(a: A[], b: B[], zipFunc: (a: A, b: B) => T): T[] {
 }
 
 
+export function zipObjects<T extends {}, U extends {[K in keyof T]: any}, V>(a: T, b: U, func: (a: T[keyof T], b: U[keyof T]) => V): {[K in keyof T]: V} {
+  const result: Partial<{[K in keyof T]: V}> = {};
+
+  for (const key of keysOf(a)) {
+    result[key] = func(a[key], b[key]);
+  }
+
+  return result as {[K in keyof T]: V};
+}
+
+
 export function padArray<T>(arr: T[], length: number, padding: T): T[] {
   if (arr.length >= length) return arr;
 

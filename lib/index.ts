@@ -43,6 +43,8 @@ const bar = p.subcommand(
     })
   }
 ).action((args) => console.log(args));
+const tokeniseResult = tokeniseArguments(['-xx', 'foo'])
 
-
-p.execute(process.argv.slice(2));
+if (tokeniseResult.success) {
+  console.log(p.suggestCompletion(tokeniseResult.tokens, '--f'));
+}

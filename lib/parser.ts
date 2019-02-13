@@ -1,6 +1,6 @@
 import { Token } from './tokens';
 import { ArgumentParserGroup } from './parsers/argument-parser';
-import { keysOf } from './utils';
+import { keysOf, values, zipObjects } from './utils';
 import { Result, success, error } from './result';
 
 
@@ -69,8 +69,13 @@ export function parse<T,A extends {[K in keyof T]: any}>(tokens: Token[], argGro
 }
 
 
-export function suggestCompletion<T,A extends {[K in keyof T]: any}>(argGroup: ArgumentParserGroup<T,A>, preceedingTokens: Token[], partialToken: string): string[] {
-  return keysOf(argGroup)
-    .map(key => argGroup[key].suggestCompletion(preceedingTokens, partialToken))
-    .reduce((allSuggestions, suggestions) => allSuggestions.concat(suggestions));
+export function suggestCompletion<T,A extends {[K in keyof T]: any}>(argGroup: ArgumentParserGroup<T,A>, preceedingTokens: Token[], partialToken: string): { newTokens: Token[], suggestions: string[] } {
+  const { finalState, newTokens } = parseArgumentGroup(initState(argGroup), preceedingTokens, argGroup);
+
+  return {
+    newTokens,
+    suggestions: values(zipObjects(argGroup, finalState, (argParser, state) => ({argParser, state})))
+      .map(({argParser, state}) => argParser.suggestCompletion(preceedingTokens, partialToken, state))
+      .reduce((suggestions, parserSuggestions) => suggestions.concat(parserSuggestions))
+  };
 }

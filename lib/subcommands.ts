@@ -1,7 +1,7 @@
 import { ArgumentParserGroup, mergeArgumentParsers } from './parsers/argument-parser';
 import { tokeniseArguments, Token } from './tokens';
-import { parse } from './parser';
-import { values, programName, screenWidth } from './utils';
+import { parse, suggestCompletion } from './parser';
+import { values, programName, screenWidth, zipObjects } from './utils';
 import { formatEntry } from './utils/strings';
 import { generateHelp } from './help';
 import { flag, Flag } from './parsers/flag';
@@ -105,6 +105,28 @@ export class RootParser<T> {
 
     process.exit(0);
   }
+
+  suggestCompletion(tokens: Token[], partialToken: string): string[] {
+    const { suggestions, newTokens } = suggestCompletion(this.argGroup, tokens, partialToken);
+
+    const nextPosArgTokenIndex = newTokens.findIndex(token => token.type === 'positional');
+
+    if (nextPosArgTokenIndex < 0) {
+      // No more positional arguments - must be this level
+      return suggestions;
+    }
+
+    const nextPosArgToken = newTokens[nextPosArgTokenIndex];
+
+    const subcommand = this.subcommandParser._getSubcommand(nextPosArgToken.value);
+
+    if (subcommand === null) {
+      // Either unknown positional arg or unknown subcommand - no suggestions
+      return [];
+    }
+
+    return subcommand.suggestCompletion(newTokens.slice(nextPosArgTokenIndex + 1), partialToken);
+  }
 }
 
 
@@ -177,6 +199,10 @@ export class SubcommandParser<T> {
       .map(({key, subcommand}) => formatEntry(` ${key}`, subcommand.description))
       .join('\n');
   }
+
+  _getSubcommand(command: string): Subcommand<T,any> | null {
+    return this.subcommandMap.get(command) || null;
+  }
 }
 
 
@@ -224,6 +250,30 @@ export class Subcommand<T,U> {
     }
 
     this.next.execute(Object.assign({}, args, removeHelp(newArgs)), newTokens);
+  }
+
+  suggestCompletion(tokens: Token[], partialToken: string): string[] {
+    const { suggestions, newTokens } = suggestCompletion(this.argGroup, tokens, partialToken);
+
+    const nextPosArgTokenIndex = newTokens.findIndex(token => token.type === 'positional');
+
+    const subcommandParser = this.getSubcommandParser();
+
+    if (subcommandParser === null || nextPosArgTokenIndex < 0) {
+      // No more positional arguments - must be this level
+      return suggestions;
+    }
+
+    const nextPosArgToken = newTokens[nextPosArgTokenIndex];
+
+    const subcommand = subcommandParser._getSubcommand(nextPosArgToken.value);
+
+    if (subcommand === null) {
+      // Either unknown positional arg or unknown subcommand - no suggestions
+      return [];
+    }
+
+    return subcommand.suggestCompletion(newTokens.slice(nextPosArgTokenIndex + 1), partialToken);
   }
 
   subcommandParser(): SubcommandParser<T & U> {

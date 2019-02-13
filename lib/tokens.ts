@@ -1,7 +1,7 @@
 export const shortOptionNameRegex = /^[a-z0-9]$/i;
 export const longOptionNameRegex = /^[a-z0-9]+(-[a-z0-9]+)*$/i;
-export const shortOptionsRegex = /^-[a-z0-9]+(=.*)?$/i;
-export const longOptionRegex = /^--[a-z0-9]+(-[a-z0-9]+)*(=.*)?$/i;
+export const shortOptionsRegex = /^-[a-z0-9]+$/i;
+export const longOptionRegex = /^--[a-z0-9]+(-[a-z0-9]+)*$/i;
 
 
 export interface ShortOptionToken {

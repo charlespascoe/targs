@@ -1,16 +1,16 @@
 import { initState, coerceState, parseArgumentGroup, parse } from '../lib/parser';
 import { success, error } from '../lib/result';
-import { ArgumentParser, ArgumentParserGroup, TokenParser } from '../lib/parsers/argument-parser';
+import { ArgumentParser, ArgumentParserGroup, TokenParser, completionResult } from '../lib/parsers/argument-parser';
 import { expect } from 'chai';
 import 'mocha';
 
 
-function dummyArgumentParser<T,S>(argParser: TokenParser<T,S>): ArgumentParser<T,S> {
+function dummyArgumentParser<T,S>(argParser: Pick<TokenParser<T,S>, Exclude<keyof TokenParser<T,S>, 'suggestCompletion'>>): ArgumentParser<T,S> {
   return {
     shortHint: '',
     hintPrefix: '',
     description: '',
-    suggestCompletion: () => [],
+    suggestCompletion: () => completionResult([]),
 
     ...argParser
   };
@@ -25,15 +25,13 @@ describe('parser', () => {
       const fooArgParser: ArgumentParser<number,number> = dummyArgumentParser<number,number>({
         initial: 123,
         read: (acc, tokens) => null,
-        coerce: (x: number) => success(x),
-        suggestCompletion: () => []
+        coerce: (x: number) => success(x)
       });
 
       const barArgParser: ArgumentParser<string,string> = dummyArgumentParser({
         initial: 'Hello, World',
         read: (acc, tokens) => null,
-        coerce: (x: string) => success(x),
-        suggestCompletion: () => []
+        coerce: (x: string) => success(x)
       });
 
 
@@ -53,15 +51,13 @@ describe('parser', () => {
       const fooArgParser: ArgumentParser<number,number> = dummyArgumentParser({
         initial: 123,
         read: (acc, tokens) => null,
-        coerce: (x: number) => error('Foo invalid'),
-        suggestCompletion: () => []
+        coerce: (x: number) => error('Foo invalid')
       });
 
       const barArgParser: ArgumentParser<string,string> = dummyArgumentParser({
         initial: 'Hello, World',
         read: (acc, tokens) => null,
-        coerce: (x: string) => success(x),
-        suggestCompletion: () => []
+        coerce: (x: string) => success(x)
       });
 
       const result = coerceState(
@@ -79,15 +75,13 @@ describe('parser', () => {
       const fooArgParser: ArgumentParser<number,number> = dummyArgumentParser({
         initial: 123,
         read: (acc, tokens) => null,
-        coerce: (x: number) => success(x * 2),
-        suggestCompletion: () => []
+        coerce: (x: number) => success(x * 2)
       });
 
       const barArgParser: ArgumentParser<string,string> = dummyArgumentParser({
         initial: 'Hello, World',
         read: (acc, tokens) => null,
-        coerce: (x: string) => success(x),
-        suggestCompletion: () => []
+        coerce: (x: string) => success(x)
       });
 
       const result = coerceState(
@@ -112,8 +106,7 @@ describe('parser', () => {
       const fooArgParser: ArgumentParser<number,number> = dummyArgumentParser({
         initial: 123,
         read: (acc, tokens) => null,
-        coerce: (x: number) => success(x),
-        suggestCompletion: () => []
+        coerce: (x: number) => success(x)
       });
 
       const result = parseArgumentGroup({foo: 456}, [], {foo: fooArgParser});
@@ -130,8 +123,7 @@ describe('parser', () => {
       const fooArgParser: ArgumentParser<number,number> = dummyArgumentParser({
         initial: 123,
         read: (acc, tokens) => null,
-        coerce: (x: number) => success(x),
-        suggestCompletion: () => []
+        coerce: (x: number) => success(x)
       });
 
       const result = parseArgumentGroup({foo: 456}, [{type: 'short', value: 'x'}], {foo: fooArgParser});
@@ -153,8 +145,7 @@ describe('parser', () => {
       const fooArgParser: ArgumentParser<number,number> = dummyArgumentParser({
         initial: 123,
         read: (acc, tokens) => ({newState: acc + 1, newTokens: []}),
-        coerce: (x: number) => success(x),
-        suggestCompletion: () => []
+        coerce: (x: number) => success(x)
       });
 
       const result = parseArgumentGroup({foo: 456}, [{type: 'short', value: 'x'}], {foo: fooArgParser});
@@ -175,8 +166,7 @@ describe('parser', () => {
       const fooArgParser: ArgumentParser<number,number> = dummyArgumentParser({
         initial: 123,
         read: (acc, tokens) => null,
-        coerce: (x: number) => error('Foo invalid'),
-        suggestCompletion: () => []
+        coerce: (x: number) => error('Foo invalid')
       });
 
       const result = parse([], {foo: fooArgParser});
@@ -191,8 +181,7 @@ describe('parser', () => {
       const fooArgParser: ArgumentParser<number,number> = dummyArgumentParser({
         initial: 123,
         read: (acc, tokens) => ({newState: 456, newTokens: []}),
-        coerce: (x: number) => success(x + 1),
-        suggestCompletion: () => []
+        coerce: (x: number) => success(x + 1)
       });
 
       const result = parse([{type: 'short', value: 'x'}], {foo: fooArgParser});

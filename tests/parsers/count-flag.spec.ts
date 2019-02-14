@@ -1,5 +1,6 @@
 import { countFlag } from '../../lib/parsers/count-flag';
 import { success, error } from '../../lib/result';
+import { completionResult } from '../../lib/parsers/argument-parser';
 import { expect } from 'chai';
 import 'mocha';
 
@@ -91,15 +92,15 @@ describe('parsers/count-flag', () => {
         longName: 'flag'
       });
 
-      expect(flg.suggestCompletion([], '-', 1)).to.deep.equal([
+      expect(flg.suggestCompletion([], '-', 1)).to.deep.equal(completionResult([
         '-f',
         '--flag'
-      ]);
+      ]));
 
-      expect(flg.suggestCompletion([], '-', 2)).to.deep.equal([
+      expect(flg.suggestCompletion([], '-', 2)).to.deep.equal(completionResult([
         '-f',
         '--flag'
-      ]);
+      ]));
     });
 
     it('should suggest short and long flags when given \'-\' as the partial token', () => {
@@ -108,10 +109,10 @@ describe('parsers/count-flag', () => {
         longName: 'flag'
       });
 
-      expect(flg.suggestCompletion([], '-', 0)).to.deep.equal([
+      expect(flg.suggestCompletion([], '-', 0)).to.deep.equal(completionResult([
         '-f',
         '--flag'
-      ]);
+      ]));
     });
 
     it('should suggest the long flag when given \'--\' or a long flag prefix as the partial token', () => {
@@ -120,15 +121,15 @@ describe('parsers/count-flag', () => {
         longName: 'flag'
       });
 
-      expect(flg.suggestCompletion([], '--', 0)).to.deep.equal([
+      expect(flg.suggestCompletion([], '--', 0)).to.deep.equal(completionResult([
         '--flag'
-      ]);
+      ]));
 
-      expect(flg.suggestCompletion([], '--fl', 0)).to.deep.equal([
+      expect(flg.suggestCompletion([], '--fl', 0)).to.deep.equal(completionResult([
         '--flag'
-      ]);
+      ]));
 
-      expect(flg.suggestCompletion([], '--as', 0)).to.deep.equal([]);
+      expect(flg.suggestCompletion([], '--as', 0)).to.deep.equal(completionResult([]));
     });
 
     it('should provide suggestions if the short flag is already present in a composite short flag', () => {
@@ -137,7 +138,7 @@ describe('parsers/count-flag', () => {
         longName: 'flag'
       });
 
-      expect(flg.suggestCompletion([], '-abfc', 0)).to.deep.equal(['-abfcf']);
+      expect(flg.suggestCompletion([], '-abfc', 0)).to.deep.equal(completionResult(['-abfcf']));
     });
 
   });

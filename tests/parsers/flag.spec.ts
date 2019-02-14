@@ -1,4 +1,5 @@
 import { flag, nonPosArgSuggestions } from '../../lib/parsers/flag';
+import { completionResult } from '../../lib/parsers/argument-parser';
 import { success, error } from '../../lib/result';
 import { expect } from 'chai';
 import 'mocha';
@@ -126,8 +127,8 @@ describe('parsers/flag', () => {
         longName: 'flag'
       });
 
-      expect(flg.suggestCompletion([], '-', 1)).to.deep.equal([]);
-      expect(flg.suggestCompletion([], '-', 2)).to.deep.equal([]);
+      expect(flg.suggestCompletion([], '-', 1)).to.deep.equal(completionResult([]));
+      expect(flg.suggestCompletion([], '-', 2)).to.deep.equal(completionResult([]));
     });
 
     it('should suggest short and long flags when given \'-\' as the partial token', () => {
@@ -136,10 +137,10 @@ describe('parsers/flag', () => {
         longName: 'flag'
       });
 
-      expect(flg.suggestCompletion([], '-', 0)).to.deep.equal([
+      expect(flg.suggestCompletion([], '-', 0)).to.deep.equal(completionResult([
         '-f',
         '--flag'
-      ]);
+      ]));
     });
 
     it('should suggest the long flag when given \'--\' or a long flag prefix as the partial token', () => {
@@ -148,15 +149,15 @@ describe('parsers/flag', () => {
         longName: 'flag'
       });
 
-      expect(flg.suggestCompletion([], '--', 0)).to.deep.equal([
+      expect(flg.suggestCompletion([], '--', 0)).to.deep.equal(completionResult([
         '--flag'
-      ]);
+      ]));
 
-      expect(flg.suggestCompletion([], '--fl', 0)).to.deep.equal([
+      expect(flg.suggestCompletion([], '--fl', 0)).to.deep.equal(completionResult([
         '--flag'
-      ]);
+      ]));
 
-      expect(flg.suggestCompletion([], '--as', 0)).to.deep.equal([]);
+      expect(flg.suggestCompletion([], '--as', 0)).to.deep.equal(completionResult([]));
     });
 
     it('should provide no suggestions if the short flag is already present in a composite short flag', () => {
@@ -165,7 +166,7 @@ describe('parsers/flag', () => {
         longName: 'flag'
       });
 
-      expect(flg.suggestCompletion([], '-abfc', 0)).to.deep.equal([]);
+      expect(flg.suggestCompletion([], '-abfc', 0)).to.deep.equal(completionResult([]));
     });
 
   });

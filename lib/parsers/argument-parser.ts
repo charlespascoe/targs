@@ -3,14 +3,30 @@ import { Result } from '../result';
 import { entries } from '../utils';
 
 
+type ReadResult<S> = {newState: S, newTokens: Token[]} | null;
+
+
 /**
   * Takes the previous parsing state and the current list of tokens,
   * and returns `null` if the state is unchanged or returns the new state and tokens
   */
-export type Read<S> = (state: S, tokens: Token[]) => {newState: S, newTokens: Token[]} | null;
+export type Read<S> = (state: S, tokens: Token[]) => ReadResult<S>;
 
 
-export type SuggestionCompleter<S> = (preceedingTokens: Token[], partialToken: string, currentState: S) => string[];
+export interface CompletionResult {
+  override: boolean;
+  suggestions: string[];
+}
+
+
+export function completionResult(suggestions: string[], override: boolean = false): CompletionResult {
+  return {
+    override,
+    suggestions
+  };
+}
+
+export type SuggestionCompleter<S> = (preceedingTokens: Token[], partialToken: string, currentState: S) => CompletionResult;
 
 
 export interface ArgumentDocumentation {

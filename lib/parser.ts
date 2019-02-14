@@ -74,8 +74,14 @@ export function suggestCompletion<T,A extends {[K in keyof T]: any}>(argGroup: A
 
   return {
     newTokens,
-    genSuggestions: () => values(zipObjects(argGroup, finalState, (argParser, state) => ({argParser, state})))
-      .map(({argParser, state}) => argParser.suggestCompletion(preceedingTokens, partialToken, state))
-      .reduce((suggestions, parserSuggestions) => suggestions.concat(parserSuggestions))
+    genSuggestions: () => {
+      const suggestions = values(zipObjects(argGroup, finalState, (argParser, state) => ({argParser, state})))
+        .map(({argParser, state}) => argParser.suggestCompletion(preceedingTokens, partialToken, state));
+
+      const anyOverride = suggestions.some(({override}) => override);
+
+      return (anyOverride ? suggestions.filter(({override}) => override) : suggestions)
+        .reduce<string[]>((allSuggestions, {suggestions}) => allSuggestions.concat(suggestions), []);
+    }
   };
 }

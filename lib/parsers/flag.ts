@@ -1,4 +1,4 @@
-import { NonPositionalArgumentParser, Read, SuggestionCompleter } from './argument-parser';
+import { NonPositionalArgumentParser, Read, SuggestionCompleter, completionResult } from './argument-parser';
 import { matchesToken, Token, shortOptionsRegex } from '../tokens';
 import { formatOptions, formatOptionsHint } from '../help';
 import { Result, success, error } from '../result';
@@ -84,10 +84,10 @@ export function flag(options: FlagOptions): Flag {
 
   const suggestCompletion = (preceedingTokens: Token[], partialToken: string, currentState: number) => {
     if (currentState > 0) {
-      return [];
+      return completionResult([]);
     }
 
-    return nonPosArgSuggestions(partialToken, shortName, longName, false);
+    return completionResult(nonPosArgSuggestions(partialToken, shortName, longName, false));
   };
 
   return {

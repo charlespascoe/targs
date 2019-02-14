@@ -1,4 +1,4 @@
-import { NonPositionalArgumentParser, Read } from './argument-parser';
+import { NonPositionalArgumentParser, Read, completionResult } from './argument-parser';
 import { matchesToken, Token } from '../tokens';
 import { formatOptions, formatOptionsHint } from '../help';
 import { Result, success, error } from '../result';
@@ -36,10 +36,10 @@ export function countFlag(options: CountFlagOptions): CountFlag {
 
   const suggestCompletion = (preceedingTokens: Token[], partialToken: string, currentState: number) => {
     if (currentState >= maxCount) {
-      return [];
+      return completionResult([]);
     }
 
-    return nonPosArgSuggestions(partialToken, shortName, longName, true);
+    return completionResult(nonPosArgSuggestions(partialToken, shortName, longName, true));
   };
 
   return {

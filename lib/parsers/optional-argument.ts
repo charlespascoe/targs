@@ -3,13 +3,14 @@ import { Result, success, error } from '../result';
 import { formatOptions, formatOptionsHint } from '../help';
 import { Token, matchesToken } from '../tokens';
 import { nonPosArgSuggestions } from './flag';
+import { multiOptionalArgument } from './multi-optional-argument';
 
 
 export interface OptionalArgumentOptions {
   shortName?: string;
   longName?: string;
   description?: string;
-  suggestCompletion?: (partialArg: string) => string[],
+  suggestCompletion?: (partialArg: string) => string[];
   metavar: string;
 }
 

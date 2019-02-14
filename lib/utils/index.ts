@@ -80,3 +80,16 @@ export const screenWidth = (() => {
   }
 })();
 
+
+
+export function takeWhile<T>(items: T[], predicate: (item: T) => boolean): T[];
+export function takeWhile<T,U extends T>(items: T[], predicate: (item: T) => item is U): U[];
+export function takeWhile<T>(items: T[], predicate: (item: T) => boolean): T[] {
+  const indexOfFirstNonMatch = items.findIndex(item => !predicate(item));
+
+  if (indexOfFirstNonMatch < 0) {
+    return items;
+  } else {
+    return items.slice(0, indexOfFirstNonMatch);
+  }
+}

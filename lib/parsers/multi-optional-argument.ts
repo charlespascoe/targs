@@ -1,5 +1,5 @@
 import { NonPositionalArgumentParser, Read, completionResult, CompletionResult } from './argument-parser';
-import { Result, SuccessResult, ErrorResult, success, error } from '../result';
+import { Result, SuccessResult, ErrorResult, success, error, mapResults } from '../result';
 import { formatOptions, formatOptionsHint } from '../help';
 import { Token, matchesToken } from '../tokens';
 import { nonPosArgSuggestions } from './flag';
@@ -40,6 +40,10 @@ export function multiOptionalArgument<T>(options: MultiOptionalArgumentOptions &
     throw new Error('At least one of shortName or longName must be defined');
   }
 
+  if (maxCount < 1) {
+    throw new Error('multiOptionalArgument: maxCount must be greater than or equal to 1');
+  }
+
   const read: Read<Array<string | null>> = (stringArgs: Array<string | null>, tokens: Token[]) => {
     if (tokens.length === 0) {
       return null;
@@ -75,15 +79,7 @@ export function multiOptionalArgument<T>(options: MultiOptionalArgumentOptions &
       return error(`You can't set ${formatOptions(shortName, longName)} argument more than ${maxCount === 1 ? 'once' : `${maxCount} times`}`);
     }
 
-    const results = (stringArgs as string[]).map(arg => readArgument(arg));
-
-    const errorResult = results.find((res): res is ErrorResult => res.success === false) || null;
-
-    if (errorResult !== null) {
-      return errorResult;
-    }
-
-    return success((results as SuccessResult<T>[]).map(res => res.value));
+    return mapResults(stringArgs as string[], arg => readArgument(arg));
   };
 
   const suggestCompletion = (preceedingTokens: Token[], partialToken: string): CompletionResult => {

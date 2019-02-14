@@ -26,3 +26,19 @@ export function error(message: string): ErrorResult {
     message
   };
 }
+
+export function mapResults<T,U>(items: T[], mapFunc: (item: T) => Result<U>): Result<U[]> {
+  const array: U[] = [];
+
+  for (const item of items) {
+    const result = mapFunc(item);
+
+    if (!result.success) {
+      return result;
+    } else {
+      array.push(result.value);
+    }
+  }
+
+  return success(array);
+}

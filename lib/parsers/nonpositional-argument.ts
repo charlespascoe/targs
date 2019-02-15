@@ -4,9 +4,10 @@ import { formatOptions, formatOptionsHint } from '../help';
 import { Token, matchesToken } from '../tokens';
 import { nonPosArgSuggestions } from './flag';
 import { multiOptionalArgument } from './multi-optional-argument';
+import { Option, some, none } from '../option';
 
 
-export interface OptionalArgumentOptions {
+export interface NonpositionalArgumentOptions {
   shortName?: string;
   longName?: string;
   description?: string;
@@ -22,21 +23,23 @@ export interface DefaultValue<D> {
   defaultValue: D;
 }
 
-export interface OptionalArgument<T> extends NonPositionalArgumentParser<T,Array<string | null>> { }
+export interface NonpositionalArgument<T> extends NonPositionalArgumentParser<T,Array<string | null>> { }
 
-export function optionalArgument(options: OptionalArgumentOptions): OptionalArgument<string | undefined>;
-export function optionalArgument<T>(options: OptionalArgumentOptions & ReadArgument<T>): OptionalArgument<T | undefined>;
-export function optionalArgument<D>(options: OptionalArgumentOptions & DefaultValue<D>): OptionalArgument<string | D>;
-export function optionalArgument<T,D>(options: OptionalArgumentOptions & ReadArgument<T> & DefaultValue<D>): OptionalArgument<T | D>;
-export function optionalArgument<T,D>(options: OptionalArgumentOptions & Partial<ReadArgument<T>> & Partial<DefaultValue<D>>): OptionalArgument<T | D> {
+export function nonpositionalArgument(options: NonpositionalArgumentOptions): NonpositionalArgument<string>;
+export function nonpositionalArgument<T>(options: NonpositionalArgumentOptions & ReadArgument<T>): NonpositionalArgument<T>;
+export function nonpositionalArgument<D>(options: NonpositionalArgumentOptions & DefaultValue<D>): NonpositionalArgument<string | D>;
+export function nonpositionalArgument<T,D>(options: NonpositionalArgumentOptions & ReadArgument<T> & DefaultValue<D>): NonpositionalArgument<T | D>;
+export function nonpositionalArgument<T,D>(options: NonpositionalArgumentOptions & Partial<ReadArgument<T>> & Partial<DefaultValue<D>>): NonpositionalArgument<T | D> {
   const {
     // I hate forcing types like this, but T defaults to string and D defaults to undefined (as per overloads),
     // but the actual function signature isn't aware of these type defaults
     // (suggestions for improvement are welcome)
-    defaultValue = (undefined as any) as D,
     readArgument = (arg: string) => success((arg as any) as T),
+    defaultValue: _ = (undefined as any) as D,
     ...multiOptions
   } = options;
+
+  const defaultValue = options.hasOwnProperty('defaultValue') ? some((options.defaultValue as any) as D) : none();
 
   // A multiOptionalArgument parses the tokens in exactly the same way (into an array of arguments),
   // except optionalArgument is only interested in the first one (hence maxCount 0)
@@ -56,7 +59,11 @@ export function optionalArgument<T,D>(options: OptionalArgumentOptions & Partial
     const argumentArray = result.value;
 
     if (argumentArray.length === 0) {
-      return success(defaultValue);
+      if (defaultValue.some) {
+        return success(defaultValue.value);
+      } else {
+        return error(`${formatOptions(shortName, longName)} is required`);
+      }
     }
 
     return success(argumentArray[0]);
@@ -74,11 +81,13 @@ export function optionalArgument<T,D>(options: OptionalArgumentOptions & Partial
   const { shortName, longName } = multiOptionArg;
   const { metavar } = options;
 
+  const shortHint = shortName !== null ? `-${shortName} ${metavar}` : `--${longName} ${metavar}`;
+
   return {
     ...multiOptionArg,
 
     coerce,
-    shortHint: shortName !== null ? `[-${shortName} ${metavar}]` : `[--${longName} ${metavar}]`,
+    shortHint: defaultValue.some ? `[${shortHint}]` : shortHint,
     suggestCompletion
   };
 }

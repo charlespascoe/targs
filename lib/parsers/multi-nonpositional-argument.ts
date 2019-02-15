@@ -3,6 +3,7 @@ import { Result, SuccessResult, ErrorResult, success, error, mapResults } from '
 import { formatOptions, formatOptionsHint } from '../help';
 import { Token, matchesToken } from '../tokens';
 import { nonPosArgSuggestions } from './flag';
+import { validateNonposNames } from '../parsers/utils';
 
 
 export interface MultiNonpositionalArgumentOptions {
@@ -36,9 +37,7 @@ export function multiNonpositionalArgument<T>(options: MultiNonpositionalArgumen
     readArgument = (arg: string) => success((arg as any) as T)
   } = options;
 
-  if (shortName === null && longName === null) {
-    throw new Error('At least one of shortName or longName must be defined');
-  }
+  validateNonposNames(shortName, longName);
 
   if (maxCount < 1) {
     throw new Error('multiOptionalArgument: maxCount must be greater than or equal to 1');

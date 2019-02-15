@@ -269,7 +269,7 @@ export class Subcommand<T,U> {
     return subcommandParser;
   }
 
-  action(action: (args: T) => void): this {
+  action(action: (args: T & U) => void): this {
     this.setNext({
       execute: (args, tokens) => {
         if (tokens.length !== 0) {

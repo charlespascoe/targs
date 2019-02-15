@@ -2,6 +2,7 @@ import { ArgumentParser, Read, CompletionResult, completionResult } from './argu
 import { Result, success, mapResults } from '../result';
 import { Token, PositionalToken } from '../tokens';
 import { takeWhile } from '../utils';
+import { validateMetavar } from '../parsers/utils';
 
 
 export interface MultiPositionalArgumentOptions {
@@ -31,6 +32,8 @@ export function multiPositionalArgument<T>(options: MultiPositionalArgumentOptio
     // (suggestions for improvement are welcome)
     readArgument = (arg: string) => success((arg as any) as T)
   } = options;
+
+  validateMetavar(metavar);
 
   if (maxCount < 1) {
     throw new Error('multiPositionalArgument: maxCount must be greater than or equal to 1');

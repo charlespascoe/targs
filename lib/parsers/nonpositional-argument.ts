@@ -3,7 +3,7 @@ import { Result, success, error } from '../result';
 import { formatOptions, formatOptionsHint } from '../help';
 import { Token, matchesToken } from '../tokens';
 import { nonPosArgSuggestions } from './flag';
-import { multiOptionalArgument } from './multi-optional-argument';
+import { multiNonpositionalArgument } from './multi-nonpositional-argument';
 import { Option, some, none } from '../option';
 
 
@@ -43,14 +43,14 @@ export function nonpositionalArgument<T,D>(options: NonpositionalArgumentOptions
 
   // A multiOptionalArgument parses the tokens in exactly the same way (into an array of arguments),
   // except optionalArgument is only interested in the first one (hence maxCount 0)
-  const multiOptionArg = multiOptionalArgument<T>({
+  const multiNonpos = multiNonpositionalArgument<T>({
     ...multiOptions,
     readArgument,
     maxCount: 1
   });
 
   const coerce = (stringArgs: Array<string | null>): Result<T | D> => {
-    const result = multiOptionArg.coerce(stringArgs);
+    const result = multiNonpos.coerce(stringArgs);
 
     if (!result.success) {
       return result;
@@ -75,16 +75,16 @@ export function nonpositionalArgument<T,D>(options: NonpositionalArgumentOptions
       return completionResult([]);
     }
 
-    return multiOptionArg.suggestCompletion(preceedingTokens, partialToken, currentState);
+    return multiNonpos.suggestCompletion(preceedingTokens, partialToken, currentState);
   };
 
-  const { shortName, longName } = multiOptionArg;
+  const { shortName, longName } = multiNonpos;
   const { metavar } = options;
 
   const shortHint = shortName !== null ? `-${shortName} ${metavar}` : `--${longName} ${metavar}`;
 
   return {
-    ...multiOptionArg,
+    ...multiNonpos,
 
     coerce,
     shortHint: defaultValue.some ? `[${shortHint}]` : shortHint,

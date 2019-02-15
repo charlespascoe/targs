@@ -5,7 +5,7 @@ import { Token, matchesToken } from '../tokens';
 import { nonPosArgSuggestions } from './flag';
 
 
-export interface MultiOptionalArgumentOptions {
+export interface MultiNonpositionalArgumentOptions {
   shortName?: string;
   longName?: string;
   metavar: string;
@@ -18,11 +18,11 @@ export interface ReadArgument<T> {
   readArgument: (arg: string) => Result<T>;
 }
 
-export interface MultiOptionalArgument<T> extends NonPositionalArgumentParser<T[],Array<string | null>> { }
+export interface MultiNonpositionalArgument<T> extends NonPositionalArgumentParser<T[],Array<string | null>> { }
 
-export function multiOptionalArgument(options: MultiOptionalArgumentOptions): MultiOptionalArgument<string>;
-export function multiOptionalArgument<T>(options: MultiOptionalArgumentOptions & ReadArgument<T>): MultiOptionalArgument<T>;
-export function multiOptionalArgument<T>(options: MultiOptionalArgumentOptions & Partial<ReadArgument<T>>): MultiOptionalArgument<T> {
+export function multiNonpositionalArgument(options: MultiNonpositionalArgumentOptions): MultiNonpositionalArgument<string>;
+export function multiNonpositionalArgument<T>(options: MultiNonpositionalArgumentOptions & ReadArgument<T>): MultiNonpositionalArgument<T>;
+export function multiNonpositionalArgument<T>(options: MultiNonpositionalArgumentOptions & Partial<ReadArgument<T>>): MultiNonpositionalArgument<T> {
   const {
     shortName = null,
     longName = null,
@@ -100,7 +100,7 @@ export function multiOptionalArgument<T>(options: MultiOptionalArgumentOptions &
     read,
     coerce,
 
-    shortHint: shortName !== null ? `[-${shortName} ${metavar}]*` : `[--${longName} ${metavar}]*`,
+    shortHint: (shortName !== null ? `[-${shortName} ${metavar}]` : `[--${longName} ${metavar}]`) + (maxCount > 1 ? '*' : ''),
     hintPrefix: `${formatOptionsHint(shortName, longName).replace(/\s+$/, '')} ${metavar}`,
     description,
     suggestCompletion,

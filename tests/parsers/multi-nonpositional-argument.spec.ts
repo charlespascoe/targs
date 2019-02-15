@@ -137,6 +137,24 @@ describe('parsers/multi-nonpositional-argument', () => {
       expect(mnpa.coerce(['1', '2', '3', '4'])).to.deep.equal(error('You can\'t set -a/--arg argument more than 2 times'));
     });
 
+    it('should return length errors before argument validation errors', () => {
+      const mnpa = multiNonpositionalArgument({
+        shortName: 'a',
+        longName: 'arg',
+        metavar: 'A',
+        maxCount: 2,
+        readArgument: (arg: string) => {
+          if (!/^\d+$/.test(arg)) {
+            return error(`Not a valid integer: '${arg}'`);
+          }
+
+          return success(parseInt(arg));
+        }
+      });
+
+      expect(mnpa.coerce(['Clearly not an integer', '2', '3', '4'])).to.deep.equal(error('You can\'t set -a/--arg argument more than 2 times'));
+    });
+
   });
 
 });

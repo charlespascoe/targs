@@ -96,7 +96,7 @@ export class RootParser<T> {
 
     if (!parseResult.success) {
       console.log(parseResult.message);
-      process.exit(1);
+      this.printHelp(1);
       return;
     }
 
@@ -114,7 +114,7 @@ export class RootParser<T> {
     return this.subcommandParser.subcommand(cmd, description, args);
   }
 
-  printHelp() {
+  printHelp(exitCode: number = 0) {
     const { programName, screenWidth } = this.options;
 
     const argParsers = values(this.argGroup);
@@ -126,7 +126,9 @@ export class RootParser<T> {
       screenWidth
     ));
 
-    process.exit(0);
+    if (exitCode >= 0) {
+      process.exit(exitCode);
+    }
   }
 
   suggestCompletion(tokens: Token[], partialToken: string): string[] {

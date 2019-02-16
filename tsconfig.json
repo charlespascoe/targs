@@ -11,5 +11,5 @@
     "lib": ["ES6"],
     "strict": true
   },
-  "include": ["./lib/"]
+  "include": ["./lib/", "./performance/"]
 }

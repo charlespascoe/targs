@@ -50,7 +50,6 @@ describe('tokens', () => {
 
     run(
       'Random arguments test (30 random arguments)',
-      100000,
       () => {
         const args = randomArgs(30);
 

@@ -10,7 +10,6 @@ describe('parsers/positional-argument', () => {
 
     run(
       'With a positional token',
-      100000,
       () => {
         const posArg = positionalArgument({
           metavar: 'X'

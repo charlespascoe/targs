@@ -9,7 +9,6 @@ describe('parsers/flag', () => {
 
     run(
       'With matching flag',
-      100000,
       () => {
         const flg = flag({shortName: 'f'})
         const state = 0;
@@ -23,7 +22,6 @@ describe('parsers/flag', () => {
 
     run(
       'With non-matching token',
-      100000,
       () => {
         const flg = flag({shortName: 'f'})
         const state = 0;
@@ -41,7 +39,6 @@ describe('parsers/flag', () => {
 
     run(
       'With count of 1',
-      100000,
       () => {
         const flg = flag({shortName: 'f'})
         const state = 1;
@@ -52,7 +49,6 @@ describe('parsers/flag', () => {
 
     run(
       'With count of 2',
-      100000,
       () => {
         const flg = flag({shortName: 'f'})
         const state = 2;

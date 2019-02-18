@@ -5,6 +5,7 @@ import { Token, matchesToken } from '../tokens';
 import { nonPosArgSuggestions } from './flag';
 import { multiNonpositionalArgument } from './multi-nonpositional-argument';
 import { Option, some, none } from '../option';
+import { ReadArgument, DefaultValue } from './common';
 
 
 export interface NonpositionalArgumentOptions {
@@ -13,14 +14,6 @@ export interface NonpositionalArgumentOptions {
   description?: string;
   suggestCompletion?: (partialArg: string) => string[];
   metavar: string;
-}
-
-export interface ReadArgument<T> {
-  readArgument: (arg: string) => Result<T>;
-}
-
-export interface DefaultValue<D> {
-  defaultValue: D;
 }
 
 export interface NonpositionalArgument<T> extends NonPositionalArgumentParser<T,Array<string | null>> { }

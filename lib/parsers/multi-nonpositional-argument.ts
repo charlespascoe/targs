@@ -4,6 +4,7 @@ import { formatOptions, formatOptionsHint } from '../help';
 import { Token, matchesToken } from '../tokens';
 import { nonPosArgSuggestions } from './flag';
 import { validateNonposNames } from '../parsers/utils';
+import { ReadArgument } from './common';
 
 
 export interface MultiNonpositionalArgumentOptions {
@@ -13,10 +14,6 @@ export interface MultiNonpositionalArgumentOptions {
   description?: string;
   suggestCompletion?: (partialArg: string) => string[],
   maxCount?: number;
-}
-
-export interface ReadArgument<T> {
-  readArgument: (arg: string) => Result<T>;
 }
 
 export interface MultiNonpositionalArgument<T> extends NonPositionalArgumentParser<T[],Array<string | null>> { }

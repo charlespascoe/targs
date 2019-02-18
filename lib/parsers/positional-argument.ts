@@ -2,22 +2,13 @@ import { ArgumentParser, Read, CompletionResult, completionResult } from './argu
 import { Option, some, none } from '../option';
 import { Result, success, error } from '../result';
 import { Token } from '../tokens';
+import { DefaultValue, ReadArgument } from './common';
 
 
 export interface PositionalArgumentOptions {
   metavar: string;
   description?: string;
   suggestCompletion?: (partialArg: string) => string[];
-}
-
-
-export interface DefaultValue<D> {
-  defaultValue: D;
-}
-
-
-export interface ReadArgument<T> {
-  readArgument: (arg: string) => Result<T>;
 }
 
 

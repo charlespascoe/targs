@@ -3,17 +3,13 @@ import { Result, success, mapResults } from '../result';
 import { Token, PositionalToken } from '../tokens';
 import { takeWhile } from '../utils';
 import { validateMetavar } from '../parsers/utils';
+import { ReadArgument } from './common';
 
 
 export interface MultiPositionalArgumentOptions {
   metavar: string;
   description?: string;
   maxCount?: number;
-}
-
-
-export interface ReadArgument<T> {
-  readArgument: (arg: string) => Result<T>;
 }
 
 

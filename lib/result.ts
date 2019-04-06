@@ -42,3 +42,14 @@ export function mapResults<T,U>(items: T[], mapFunc: (item: T) => Result<U>): Re
 
   return success(array);
 }
+
+
+export function mapSuccess<T,U>(func: (arg: T) => Result<U>) {
+  return (prevResult: Result<T>): Result<U> => {
+    if (prevResult.success) {
+      return func(prevResult.value);
+    } else {
+      return prevResult;
+    }
+  };
+}

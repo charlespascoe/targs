@@ -7,18 +7,29 @@ import {
 } from './parsers/argument-parser';
 import { values } from './utils';
 import { SubcommandParser } from './subcommands';
-import { formatEntry } from './utils/strings';
+import { entryFormatter } from './utils/strings';
 
 
 type CompleteArgumentDocumentation = ArgumentDocumentation | ArgumentDocumentation & NonPositionalArgument;
 
 
-export function generateUsageString(programName: string, argDocs: CompleteArgumentDocumentation[]): string {
-  return `usage: ${programName} ${generateNonPositionalHints(argDocs)} ${generatePositionalHints(argDocs)}`;
+export function generateUsageString(
+  programName: string,
+  argDocs: CompleteArgumentDocumentation[]
+): string {
+
+  return 'usage: ' +
+    programName + ' ' +
+    generateNonPositionalHints(argDocs) + ' ' +
+    generatePositionalHints(argDocs);
 }
 
-export function generateParserGroupHelp(argParsers: ArgumentParser<any,any>[], formatEntry: (left: string, right: string) => string): string {
-  let result = '';
+export function generateParserGroupHelp(
+  argParsers: ArgumentParser<any,any>[],
+  formatEntry: (left: string, right: string) => string
+): string {
+
+  let helpString = '';
 
   const nonPositionalArguments = argParsers
     .filter(argParser => isNonPositionalArgumentParser(argParser));
@@ -27,27 +38,33 @@ export function generateParserGroupHelp(argParsers: ArgumentParser<any,any>[], f
     .filter(argParser => !isNonPositionalArgumentParser(argParser));
 
   if (nonPositionalArguments.length > 0) {
-    result += '\nNon-Positional Arguments:\n';
-    result += nonPositionalArguments
+    helpString += '\nNon-Positional Arguments:\n';
+    helpString += nonPositionalArguments
         .map(argParser => formatEntry(argParser.hintPrefix, argParser.description))
         .join('\n') + '\n'
   }
 
   if (positionalArguments.length > 0) {
-    result += '\nPositional Arguments:\n';
-    result += positionalArguments
+    helpString += '\nPositional Arguments:\n';
+    helpString += positionalArguments
       .map(argParser => formatEntry(argParser.hintPrefix, argParser.description))
       .join('\n') + '\n';
   }
 
-  return result;
+  return helpString;
 }
 
-function isNonPositionalArgumentParser(argDoc: CompleteArgumentDocumentation): argDoc is ArgumentDocumentation & NonPositionalArgument {
-  return typeof (argDoc as NonPositionalArgument).shortName === 'string' || typeof (argDoc as NonPositionalArgument).longName === 'string';
+function isNonPositionalArgumentParser(
+  argDoc: CompleteArgumentDocumentation
+): argDoc is ArgumentDocumentation & NonPositionalArgument {
+
+  return (
+    typeof (argDoc as NonPositionalArgument).shortName === 'string' ||
+    typeof (argDoc as NonPositionalArgument).longName === 'string'
+  );
 }
 
-function generateNonPositionalHints(argDocs: CompleteArgumentDocumentation[]): string{
+function generateNonPositionalHints(argDocs: CompleteArgumentDocumentation[]): string {
   const nonPosArgDocs = argDocs
     .filter(argParser => isNonPositionalArgumentParser(argParser));
 
@@ -95,12 +112,23 @@ export function formatOptionsHint(shortName: string | null, longName: string | n
   );
 }
 
-export function generateHelp(programName: string, argParsers: ArgumentParser<any,any>[], subcommandParser: SubcommandParser<any> | null, screenWidth: number): string {
+export function generateHelp(
+  programName: string,
+  argParsers: ArgumentParser<any,any>[],
+  subcommandParser: SubcommandParser<any> | null,
+  screenWidth: number
+): string {
+
   const longestHintLength = argParsers
     .map(argParser => argParser.hintPrefix.length)
     .reduce((longest, length) => Math.max(longest, length), 0);
 
-  const longestSubcommand = subcommandParser === null ? 0 : subcommandParser.getMaxCommandLength() + 1; // +1 to allow a space before
+  const longestSubcommand = (
+    subcommandParser === null ?
+      0
+    :
+      subcommandParser.getMaxCommandLength() + 1 // +1 to allow a space before
+  );
 
   const leftColumnWidth = Math.min(
     Math.max(longestHintLength, longestSubcommand),
@@ -110,19 +138,19 @@ export function generateHelp(programName: string, argParsers: ArgumentParser<any
   const separationSpaces = 2;
   const rightColumnWidth = screenWidth - leftColumnWidth - separationSpaces;
 
-  const formatter = formatEntry(leftColumnWidth, separationSpaces, rightColumnWidth);
+  const formatter = entryFormatter(leftColumnWidth, separationSpaces, rightColumnWidth);
 
-  let result = '';
+  let helpString = '';
 
-  result += generateUsageString(programName, argParsers);
-  result += subcommandParser === null ? '\n' : '<SUBCOMMAND>\n';
+  helpString += generateUsageString(programName, argParsers);
+  helpString += subcommandParser === null ? '\n' : '<SUBCOMMAND>\n';
 
-  result += generateParserGroupHelp(argParsers, formatter);
+  helpString += generateParserGroupHelp(argParsers, formatter);
 
   if (subcommandParser !== null) {
-    result += '\nSubcommands:\n';
-    result += subcommandParser.generateHelpText(formatter) + '\n';
+    helpString += '\nSubcommands:\n';
+    helpString += subcommandParser.generateHelpText(formatter) + '\n';
   }
 
-  return result;
+  return helpString;
 }

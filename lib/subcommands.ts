@@ -1,8 +1,8 @@
 import { ArgumentParserGroup, mergeArgumentParsers } from './parsers/argument-parser';
-import { tokeniseArguments, Token } from './tokens';
+import { tokeniseArguments, Token, formatToken } from './tokens';
 import { parse, suggestCompletion } from './parser';
 import { values, programName, screenWidth, zipObjects } from './utils';
-import { formatEntry } from './utils/strings';
+import { entryFormatter, highlightItem } from './utils/strings';
 import { generateHelp } from './help';
 import { flag, Flag } from './parsers/flag';
 
@@ -17,8 +17,17 @@ function removeHelp<T>(args: T & {[help]: boolean}): T {
 }
 
 
-function suggestCompletionWithSubcommandParser(argGroup: ArgumentParserGroup, tokens: Token[], partialToken: string, subcommandParser: SubcommandParser<any> | null): string[] {
-  const { genSuggestions, newTokens } = suggestCompletion(argGroup, tokens, partialToken);
+function suggestCompletionWithSubcommandParser(
+  argGroup: ArgumentParserGroup,
+  tokens: Token[],
+  partialToken: string,
+  subcommandParser: SubcommandParser<any> | null
+): string[] {
+
+  const {
+    genSuggestions,
+    newTokens
+  } = suggestCompletion(argGroup, tokens, partialToken);
 
   const nextPosArgTokenIndex = newTokens.findIndex(token => token.type === 'positional');
 
@@ -40,7 +49,10 @@ function suggestCompletionWithSubcommandParser(argGroup: ArgumentParserGroup, to
 }
 
 
-export function parser<T>(argGroup: ArgumentParserGroup<T,any>, options: Partial<ParserOptions> = {}): RootParser<T> {
+export function parser<T>(
+  argGroup: ArgumentParserGroup<T,any>,
+  options: Partial<ParserOptions> = {}
+): RootParser<T> {
   return new RootParser(
     argGroup,
     {
@@ -184,9 +196,13 @@ export class SubcommandParser<T> {
     subcommand.execute(args, tailTokens);
   }
 
-  subcommand<U>(cmd: string, description: string, argGroup: ArgumentParserGroup<U,any>): Subcommand<T,U> {
+  subcommand<U>(
+    cmd: string,
+    description: string,
+    argGroup: ArgumentParserGroup<U,any>
+  ): Subcommand<T,U> {
     if (this.subcommandMap.has(cmd)) {
-      throw new Error(`Duplicate subcommand declared:  ${cmd}`);
+      throw new Error(`Duplicate subcommand declared: ${cmd}`);
     }
 
     const subcmd = new Subcommand<T,U>(
@@ -205,7 +221,12 @@ export class SubcommandParser<T> {
   }
 
   getMaxCommandLength(): number {
-    return Array.from(this.subcommandMap.keys()).map(key => key.length).reduce((max, length) => Math.max(length, max), 0);
+    return Array.from(this.subcommandMap.keys())
+      .map(key => key.length)
+      .reduce(
+        (max, length) => Math.max(length, max),
+        0
+      );
   }
 
   generateHelpText(formatEntry: (leftColumn: string, rightColumn: string) => string): string {

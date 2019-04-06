@@ -93,3 +93,14 @@ export function takeWhile<T>(items: T[], predicate: (item: T) => boolean): T[] {
     return items.slice(0, indexOfFirstNonMatch);
   }
 }
+
+
+export function range(start: number, exclusiveEnd: number): number[] {
+  const result: number[] = [];
+
+  for (let i = start; i < exclusiveEnd; i++) {
+    result.push(i);
+  }
+
+  return result;
+}

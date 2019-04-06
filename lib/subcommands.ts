@@ -52,7 +52,9 @@ export function parser<T>(argGroup: ArgumentParserGroup<T,any>, options: Partial
         description: 'Prints help and quits'
       }),
       ...options
-    }
+    },
+    (line) => console.log(line),
+    (exitCode) => process.exit(exitCode)
   );
 }
 
@@ -70,14 +72,19 @@ export class RootParser<T> {
 
   constructor(
     argGroup: ArgumentParserGroup<T>,
-    private readonly options: ParserOptions
+    private readonly options: ParserOptions,
+    private readonly output: (line: string) => void,
+    private readonly exit: (code: number) => void
   ) {
     this.argGroup = mergeArgumentParsers(
       {[help]: this.options.helpFlag},
       argGroup
     );
 
-    this.subcommandParser = new SubcommandParser(() => this.printHelp(), options);
+    this.subcommandParser = new SubcommandParser(
+      () => this.printHelp(),
+      options
+    );
   }
 
   execute(stringArgs: string[]): void {
@@ -85,8 +92,10 @@ export class RootParser<T> {
     const tokeniseResult = tokeniseArguments(stringArgs);
 
     if (!tokeniseResult.success) {
-      console.log('FAIL');
-      process.exit(1);
+      const { index, message } = tokeniseResult;
+      this.output(`${message}:`);
+      this.output(highlightItem([this.options.programName, ...stringArgs], index + 1));
+      this.exit(1);
       return;
     }
 
@@ -95,7 +104,7 @@ export class RootParser<T> {
     const parseResult = parse(tokens, this.argGroup);
 
     if (!parseResult.success) {
-      console.log(parseResult.message);
+      this.output(parseResult.message);
       this.printHelp(1);
       return;
     }
@@ -119,7 +128,7 @@ export class RootParser<T> {
 
     const argParsers = values(this.argGroup);
 
-    console.log(generateHelp(
+    this.output(generateHelp(
       programName,
       argParsers,
       this.subcommandParser,
@@ -127,7 +136,7 @@ export class RootParser<T> {
     ));
 
     if (exitCode >= 0) {
-      process.exit(exitCode);
+      this.exit(exitCode);
     }
   }
 
@@ -157,8 +166,8 @@ export class SubcommandParser<T> {
     const tailTokens = tokens.slice(1);
 
     if (headToken.type !== 'positional') {
-      // TODO: print something useful
-      console.log('Unknown option');
+      console.log(`Unknown option: ${formatToken(headToken)}`);
+      this.printHelp();
       process.exit(1);
       return;
     }
@@ -166,8 +175,8 @@ export class SubcommandParser<T> {
     const subcommand = this.subcommandMap.get(headToken.value) || null;
 
     if (subcommand === null) {
-      // TODO: make the message more useful (e.g. print help or list of subcommands)
-      console.log('Unknown subcommand:', headToken.value);
+      console.log('Unknown subcommand:', formatToken(headToken));
+      this.printHelp();
       process.exit(1);
       return;
     }
@@ -275,8 +284,8 @@ export class Subcommand<T,U> {
     this.setNext({
       execute: (args, tokens) => {
         if (tokens.length !== 0) {
-          // TODO: Make message more useful
-          console.log('Unknown token');
+          console.log(`Unknown argument: ${formatToken(tokens[0])}`);
+          this.printHelp();
           process.exit(0);
           return;
         }

@@ -114,7 +114,7 @@ describe('tokeniseArguments', () => {
 
     expect(result).to.deep.equal({
       success: false,
-      message: 'Unknown token',
+      message: 'Unparsable token',
       args: ['---------------------'],
       index: 0
     });

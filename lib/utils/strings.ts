@@ -43,3 +43,20 @@ export function splitLines(text: string, maxWidth: number): string[] {
 
   return lines;
 }
+
+
+export function highlightItem(items: string[], highlightIndex: number): string;
+export function highlightItem(items: string[], highlightIndices: Set<number>): string;
+export function highlightItem(items: string[], highlightIndices: number | Set<number>): string {
+  const highlighItems: Set<number> = (
+    typeof highlightIndices === 'number' ?
+      new Set([highlightIndices])
+    :
+      highlightIndices
+  );
+
+  return (
+    items.join(' ') + '\n' +
+    items.map((item, index) => (highlighItems.has(index) ? '^' : ' ').repeat(item.length)).join(' ')
+  );
+}

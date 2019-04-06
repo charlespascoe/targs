@@ -25,6 +25,20 @@ export interface PositionalToken {
 export type Token = ShortOptionToken | LongOptionToken | PositionalToken;
 
 
+export function formatToken(token: Token): string {
+  switch (token.type) {
+    case 'short':
+      return `-${token.value}`;
+
+    case 'long':
+      return `--${token.value}`;
+
+    case 'positional':
+      return `'${token.value}'`;
+  }
+}
+
+
 export interface TokenParseSuccess {
   success: true;
   tokens: Token[];
@@ -88,7 +102,7 @@ export function tokeniseArguments(args: string[]): TokenParseSuccess | TokenPars
 
     return {
       success: false,
-      message: 'Unknown token',
+      message: 'Unparsable token',
       args,
       index
     };

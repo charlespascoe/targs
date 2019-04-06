@@ -1,6 +1,6 @@
 import { ArgumentParserGroup, mergeArgumentParsers } from './parsers/argument-parser';
 import { tokeniseArguments, Token, formatToken } from './tokens';
-import { parse, suggestCompletion } from './parser';
+import { parse, suggestCompletion } from './group-parsing';
 import { values, programName, screenWidth, zipObjects } from './utils';
 import { entryFormatter, highlightItem } from './utils/strings';
 import { generateHelp } from './help';

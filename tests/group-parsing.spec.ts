@@ -1,4 +1,4 @@
-import { initState, coerceState, parseArgumentGroup, parse } from '../lib/parser';
+import { initState, coerceState, parseArgumentGroup, parse } from '../lib/group-parsing';
 import { success, error } from '../lib/result';
 import { ArgumentParser, ArgumentParserGroup, TokenParser, completionResult } from '../lib/parsers/argument-parser';
 import { expect } from 'chai';

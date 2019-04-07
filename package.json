@@ -9,8 +9,8 @@
     "watch": "rm -rf ./dist/ && tsc --pretty -w",
     "clean": "rm -rf ./dist/",
     "test": "mocha -r ts-node/register tests/*.spec.ts tests/**/*.spec.ts",
-    "pack": "npm run build && cp package.json README.md ./dist/ && npm pack ./dist/",
-    "pub": "npm run build && cp package.json README.md ./dist/ && npm publish ./dist/"
+    "pub": "npm run build && cp package.json README.md ./dist/ && npm publish ./dist/",
+    "pub:beta": "npm run build && cp package.json README.md ./dist/ && npm publish --tag beta ./dist/"
   },
   "repository": {
     "type": "git",

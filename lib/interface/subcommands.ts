@@ -4,16 +4,19 @@ import { values, programName, screenWidth, zipObjects } from '../utils';
 import { entryFormatter, highlightItem } from '../utils/strings';
 import { generateHelp } from '../help';
 import { flag, Flag } from '../parsers/flag';
+import { 
+  help,
+  removeHelp,
+  tokeniseStringArguments,
+  parseTokens,
+  printHelpWithTokens,
+  checkUnparsedNonpositionalTokens
+} from '../interface/common';
+import { compose } from '../compose';
+import { mapSuccess } from '../result';
 
 
-const help = Symbol('help');
 
-
-function removeHelp<T>(args: T & {[help]: boolean}): T {
-  const newArgs = Object.assign({}, args);
-  delete newArgs[help];
-  return newArgs as T;
-}
 
 
 function suggestCompletionWithSubcommandParser(
@@ -100,34 +103,28 @@ export class RootParser<T> {
 
   execute(stringArgs: string[]): void {
 
-    const tokeniseResult = tokeniseArguments(stringArgs);
+    const parse = compose(
+      tokeniseStringArguments,
+      mapSuccess(parseTokens(this.argGroup)),
+      mapSuccess(checkUnparsedNonpositionalTokens),
+      printHelpWithTokens(
+        this.options.programName,
+        this.options.screenWidth,
+        this.argGroup
+      )
+    );
 
-    if (!tokeniseResult.success) {
-      const { index, message } = tokeniseResult;
-      this.output(`${message}:`);
-      this.output(highlightItem([this.options.programName, ...stringArgs], index + 1));
+    const result = parse(stringArgs);
+
+    if (!result.success) {
+      this.output(result.message);
       this.exit(1);
       return;
     }
 
-    const { tokens } = tokeniseResult;
+    const { args, newTokens } = result.value;
 
-    const parseResult = parseArgumentGroup(tokens, this.argGroup);
-
-    if (!parseResult.success) {
-      this.output(parseResult.message);
-      this.printHelp(1);
-      return;
-    }
-
-    const { args, tokens: newTokens } = parseResult.value;
-
-    if (args[help]) {
-      this.printHelp();
-      return;
-    }
-
-    this.subcommandParser.execute(removeHelp(args), newTokens);
+    this.subcommandParser.execute(args, newTokens);
   }
 
   subcommand<U>(cmd: string, description: string, args: ArgumentParserGroup<U,any>): Subcommand<T,U> {

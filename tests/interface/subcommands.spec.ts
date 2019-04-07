@@ -31,10 +31,11 @@ describe('lib/interface/subcommands', () => {
 
       rp.execute('a -b --c -wr-ong d e f'.split(' '));
 
-      expect(output).to.deep.equal([
+      // The rest is just help output
+      expect(output.slice(0, 3)).to.deep.equal([
         'Unparsable token:',
-        'test a -b --c -wr-ong d e f',
-        '              ^^^^^^^      '
+        'a -b --c -wr-ong d e f',
+        '         ^^^^^^^      '
       ]);
 
       expect(exitCode).to.equal(1);

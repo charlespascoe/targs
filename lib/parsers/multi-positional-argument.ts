@@ -37,7 +37,10 @@ export function multiPositionalArgument<T>(options: MultiPositionalArgumentOptio
 
   const read: Read<string[]> = (state: string[], tokens: Token[]) => {
     if (state.length > 0) {
-      // Already read positional arguments
+      // Already read positional arguments.
+      // This means that a sequence of positional arguments
+      // are separated by a non-positional argument (e.g. a flag),
+      // then only the pos args before the nonpos arg is read
       return null;
     }
 

@@ -1,17 +1,17 @@
-import { positionalArgument } from '../../lib/parsers/positional-argument';
+import { positional } from '../../lib/parsers/positional';
 import { none } from '../../lib/option';
 import { Token } from '../../lib/tokens';
 import { describe, run } from '../common';
 
 
-describe('parsers/positional-argument', () => {
+describe('parsers/positional', () => {
 
   describe('PositionalArgument.read', () => {
 
     run(
       'With a positional token',
       () => {
-        const posArg = positionalArgument({
+        const posArg = positional({
           metavar: 'X'
         });
 

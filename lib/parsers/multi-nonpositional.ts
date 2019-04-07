@@ -7,7 +7,7 @@ import { validateNonposNames } from '../parsers/utils';
 import { ReadArgument } from './common';
 
 
-export interface MultiNonpositionalArgumentOptions {
+export interface MultiNonpositionalOptions {
   shortName?: string;
   longName?: string;
   metavar: string;
@@ -16,11 +16,11 @@ export interface MultiNonpositionalArgumentOptions {
   maxCount?: number;
 }
 
-export interface MultiNonpositionalArgument<T> extends NonPositionalArgumentParser<T[],Array<string | null>> { }
+export interface MultiNonpositional<T> extends NonPositionalArgumentParser<T[],Array<string | null>> { }
 
-export function multiNonpositionalArgument(options: MultiNonpositionalArgumentOptions): MultiNonpositionalArgument<string>;
-export function multiNonpositionalArgument<T>(options: MultiNonpositionalArgumentOptions & ReadArgument<T>): MultiNonpositionalArgument<T>;
-export function multiNonpositionalArgument<T>(options: MultiNonpositionalArgumentOptions & Partial<ReadArgument<T>>): MultiNonpositionalArgument<T> {
+export function multiNonpositional(options: MultiNonpositionalOptions): MultiNonpositional<string>;
+export function multiNonpositional<T>(options: MultiNonpositionalOptions & ReadArgument<T>): MultiNonpositional<T>;
+export function multiNonpositional<T>(options: MultiNonpositionalOptions & Partial<ReadArgument<T>>): MultiNonpositional<T> {
   const {
     shortName = null,
     longName = null,

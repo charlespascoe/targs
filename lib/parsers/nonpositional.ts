@@ -3,12 +3,12 @@ import { Result, success, error } from '../result';
 import { formatOptions, formatOptionsHint } from '../help';
 import { Token, matchesToken } from '../tokens';
 import { nonPosArgSuggestions } from './flag';
-import { multiNonpositionalArgument } from './multi-nonpositional-argument';
+import { multiNonpositional } from './multi-nonpositional';
 import { Option, some, none } from '../option';
 import { ReadArgument, DefaultValue } from './common';
 
 
-export interface NonpositionalArgumentOptions {
+export interface NonpositionalOptions {
   shortName?: string;
   longName?: string;
   description?: string;
@@ -16,13 +16,13 @@ export interface NonpositionalArgumentOptions {
   metavar: string;
 }
 
-export interface NonpositionalArgument<T> extends NonPositionalArgumentParser<T,Array<string | null>> { }
+export interface Nonpositional<T> extends NonPositionalArgumentParser<T,Array<string | null>> { }
 
-export function nonpositionalArgument(options: NonpositionalArgumentOptions): NonpositionalArgument<string>;
-export function nonpositionalArgument<T>(options: NonpositionalArgumentOptions & ReadArgument<T>): NonpositionalArgument<T>;
-export function nonpositionalArgument<D>(options: NonpositionalArgumentOptions & DefaultValue<D>): NonpositionalArgument<string | D>;
-export function nonpositionalArgument<T,D>(options: NonpositionalArgumentOptions & ReadArgument<T> & DefaultValue<D>): NonpositionalArgument<T | D>;
-export function nonpositionalArgument<T,D>(options: NonpositionalArgumentOptions & Partial<ReadArgument<T>> & Partial<DefaultValue<D>>): NonpositionalArgument<T | D> {
+export function nonpositional(options: NonpositionalOptions): Nonpositional<string>;
+export function nonpositional<T>(options: NonpositionalOptions & ReadArgument<T>): Nonpositional<T>;
+export function nonpositional<D>(options: NonpositionalOptions & DefaultValue<D>): Nonpositional<string | D>;
+export function nonpositional<T,D>(options: NonpositionalOptions & ReadArgument<T> & DefaultValue<D>): Nonpositional<T | D>;
+export function nonpositional<T,D>(options: NonpositionalOptions & Partial<ReadArgument<T>> & Partial<DefaultValue<D>>): Nonpositional<T | D> {
   const {
     // I hate forcing types like this, but T defaults to string and D defaults to undefined (as per overloads),
     // but the actual function signature isn't aware of these type defaults
@@ -36,7 +36,7 @@ export function nonpositionalArgument<T,D>(options: NonpositionalArgumentOptions
 
   // A multiOptionalArgument parses the tokens in exactly the same way (into an array of arguments),
   // except optionalArgument is only interested in the first one (hence maxCount 0)
-  const multiNonpos = multiNonpositionalArgument<T>({
+  const multiNonpos = multiNonpositional<T>({
     ...multiOptions,
     readArgument,
     maxCount: 1

@@ -1,4 +1,4 @@
 import './parsers/flag';
-import './parsers/positional-argument';
+import './parsers/positional';
 import './tokens';
 import './parser';

@@ -5,21 +5,21 @@ import { Token } from '../tokens';
 import { DefaultValue, ReadArgument } from './common';
 
 
-export interface PositionalArgumentOptions {
+export interface PositionalOptions {
   metavar: string;
   description?: string;
   suggestCompletion?: (partialArg: string) => string[];
 }
 
 
-export type PositionalArgument<T> = ArgumentParser<T,Option<string>>;
+export type Positional<T> = ArgumentParser<T,Option<string>>;
 
 
-export function positionalArgument(options: PositionalArgumentOptions): PositionalArgument<string>;
-export function positionalArgument<T>(options: PositionalArgumentOptions & ReadArgument<T>): PositionalArgument<T>;
-export function positionalArgument<D>(options: PositionalArgumentOptions & DefaultValue<D>): PositionalArgument<string | D>;
-export function positionalArgument<T,D>(options: PositionalArgumentOptions & ReadArgument<T> & DefaultValue<D>): PositionalArgument<T | D>;
-export function positionalArgument<T,D>(options: PositionalArgumentOptions & Partial<ReadArgument<T>> & Partial<DefaultValue<D>>): PositionalArgument<T | D> {
+export function positional(options: PositionalOptions): Positional<string>;
+export function positional<T>(options: PositionalOptions & ReadArgument<T>): Positional<T>;
+export function positional<D>(options: PositionalOptions & DefaultValue<D>): Positional<string | D>;
+export function positional<T,D>(options: PositionalOptions & ReadArgument<T> & DefaultValue<D>): Positional<T | D>;
+export function positional<T,D>(options: PositionalOptions & Partial<ReadArgument<T>> & Partial<DefaultValue<D>>): Positional<T | D> {
   const {
     metavar,
     description = '',

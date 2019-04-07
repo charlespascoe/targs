@@ -1,4 +1,4 @@
-import { multiPositionalArgument } from '../../lib/parsers/multi-positional-argument';
+import { multiPositional } from '../../lib/parsers/multi-positional';
 import { completionResult } from '../../lib/parsers/argument-parser';
 import { success, error } from '../../lib/result';
 import { Token } from '../../lib/tokens';
@@ -6,16 +6,16 @@ import { expect } from 'chai';
 import 'mocha';
 
 
-describe('parsers/multi-positional-argument', () => {
+describe('parsers/multi-positional', () => {
 
-  describe('multiPositionalArgument', () => {
+  describe('multiPositional', () => {
 
     it('should not allow an invalid metavar', () => {
-      expect(() => multiPositionalArgument({metavar: 'this *IS* invalid'})).to.throw('metavar \'this *IS* invalid\' is invalid (must match /^[A-Z][A-Z_0-9\\-]*$/)');
+      expect(() => multiPositional({metavar: 'this *IS* invalid'})).to.throw('metavar \'this *IS* invalid\' is invalid (must match /^[A-Z][A-Z_0-9\\-]*$/)');
     });
 
     it('should not allow maxCount to be less than 1', () => {
-      expect(() => multiPositionalArgument({metavar: 'X', maxCount: 0})).to.throw('multiPositionalArgument: maxCount must be greater than or equal to 1');
+      expect(() => multiPositional({metavar: 'X', maxCount: 0})).to.throw('multiPositional: maxCount must be greater than or equal to 1');
     });
 
   });
@@ -23,7 +23,7 @@ describe('parsers/multi-positional-argument', () => {
   describe('MultiPositionalArgument.read', () => {
 
     it('should return null if the state has already been set', () => {
-      const mpa = multiPositionalArgument({
+      const mpa = multiPositional({
         metavar: 'X'
       });
 
@@ -31,7 +31,7 @@ describe('parsers/multi-positional-argument', () => {
     });
 
     it('should read all leading positional tokens', () => {
-      const mpa = multiPositionalArgument({
+      const mpa = multiPositional({
         metavar: 'X'
       });
 
@@ -59,7 +59,7 @@ describe('parsers/multi-positional-argument', () => {
     });
 
     it('should read all leading positional tokens up to and including maxCount', () => {
-      const mpa = multiPositionalArgument({
+      const mpa = multiPositional({
         metavar: 'X',
         maxCount: 2
       });
@@ -88,7 +88,7 @@ describe('parsers/multi-positional-argument', () => {
     });
 
     it('should return null if the next token is not a positional token', () => {
-      const mpa = multiPositionalArgument({
+      const mpa = multiPositional({
         metavar: 'X'
       });
 
@@ -100,7 +100,7 @@ describe('parsers/multi-positional-argument', () => {
   describe('MultiPositionalArgument.coerce', () => {
 
     it('should return the correct string results', () => {
-      const mpa = multiPositionalArgument({
+      const mpa = multiPositional({
         metavar: 'X'
       });
 
@@ -108,7 +108,7 @@ describe('parsers/multi-positional-argument', () => {
     });
 
     it('should correctly use readArgument to parse each argument', () => {
-      const mpa = multiPositionalArgument({
+      const mpa = multiPositional({
         metavar: 'X',
         readArgument: (arg: string) => success(parseInt(arg))
       });
@@ -117,7 +117,7 @@ describe('parsers/multi-positional-argument', () => {
     });
 
     it('should return the first error that readArgument returns', () => {
-      const mpa = multiPositionalArgument({
+      const mpa = multiPositional({
         metavar: 'X',
         readArgument: (arg: string) => {
           if (!/^\d+$/.test(arg)) {

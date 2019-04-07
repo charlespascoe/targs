@@ -65,7 +65,7 @@ export function multiPositional<T>(options: MultiPositionalOptions & Partial<Rea
     suggestCompletion: () => completionResult([]),
 
     shortHint: `${metavar}*`,
-    hintPrefix: metavar,
+    hintPrefix: ` ${metavar}`,
     description
   };
 }

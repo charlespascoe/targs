@@ -62,7 +62,7 @@ export function positional<T,D>(options: PositionalOptions & Partial<ReadArgumen
     suggestCompletion: (_, partialToken: string) => completionResult(userSuggestCompleition(partialToken)),
 
     shortHint: defaultValue.some ? metavar : `[${metavar}]`,
-    hintPrefix: metavar,
+    hintPrefix: ` ${metavar}`,
     description
   };
 }

@@ -5,6 +5,7 @@ import { values } from '../utils';
 import { highlightItem } from '../utils/strings';
 import { generateHelp } from '../help';
 import { flag } from '../parsers/flag';
+import { SubcommandParser } from '../interface/subcommands';
 
 
 export const help = Symbol('help');
@@ -110,12 +111,13 @@ export function printHelp<T>(
 export function printHelpWithTokens<T>(
   programName: string,
   screenWidth: number,
+  subcommandParser: SubcommandParser<T> | null,
   argGroup: ArgumentParserGroup<any,any>,
 ) {
   const genHelp = () => generateHelp(
     programName,
     values(argGroup),
-    null,
+    subcommandParser,
     screenWidth
   );
 

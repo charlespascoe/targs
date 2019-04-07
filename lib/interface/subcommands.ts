@@ -16,9 +16,6 @@ import { compose } from '../compose';
 import { mapSuccess } from '../result';
 
 
-
-
-
 function suggestCompletionWithSubcommandParser(
   argGroup: ArgumentParserGroup,
   tokens: Token[],
@@ -101,7 +98,7 @@ export class RootParser<T> {
     );
   }
 
-  execute(stringArgs: string[]): void {
+  execute(stringArgs: string[] = process.argv.slice(2)): void {
 
     const parse = compose(
       tokeniseStringArguments,
@@ -110,6 +107,7 @@ export class RootParser<T> {
       printHelpWithTokens(
         this.options.programName,
         this.options.screenWidth,
+        this.subcommandParser,
         this.argGroup
       )
     );

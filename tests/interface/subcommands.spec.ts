@@ -1,10 +1,10 @@
-import { RootParser } from '../lib/subcommands';
-import { flag } from '../lib/parsers';
+import { RootParser } from '../../lib/interface/subcommands';
+import { flag } from '../../lib/parsers';
 import { expect } from 'chai';
 import 'mocha';
 
 
-describe('lib/subcommands', () => {
+describe('lib/interface/subcommands', () => {
 
   describe('RootParser', () => {
 

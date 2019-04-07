@@ -6,7 +6,7 @@ import {
 } from './parsers/argument-parser';
 import { ArgumentParserGroup } from './argument-parser-group';
 import { values } from './utils';
-import { SubcommandParser } from './subcommands';
+import { SubcommandParser } from './interface/subcommands';
 import { entryFormatter } from './utils/strings';
 
 

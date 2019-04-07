@@ -1,9 +1,9 @@
-import { ArgumentParserGroup, mergeArgumentParserGroups, parseArgumentGroup, suggestCompletion } from './argument-parser-group';
-import { tokeniseArguments, Token, formatToken } from './tokens';
-import { values, programName, screenWidth, zipObjects } from './utils';
-import { entryFormatter, highlightItem } from './utils/strings';
-import { generateHelp } from './help';
-import { flag, Flag } from './parsers/flag';
+import { ArgumentParserGroup, mergeArgumentParserGroups, parseArgumentGroup, suggestCompletion } from '../argument-parser-group';
+import { tokeniseArguments, Token, formatToken } from '../tokens';
+import { values, programName, screenWidth, zipObjects } from '../utils';
+import { entryFormatter, highlightItem } from '../utils/strings';
+import { generateHelp } from '../help';
+import { flag, Flag } from '../parsers/flag';
 
 
 const help = Symbol('help');

@@ -1,6 +1,5 @@
-import { ArgumentParserGroup, mergeArgumentParsers } from './parsers/argument-parser';
+import { ArgumentParserGroup, mergeArgumentParserGroups, parseArgumentGroup, suggestCompletion } from './argument-parser-group';
 import { tokeniseArguments, Token, formatToken } from './tokens';
-import { parse, suggestCompletion } from './group-parsing';
 import { values, programName, screenWidth, zipObjects } from './utils';
 import { entryFormatter, highlightItem } from './utils/strings';
 import { generateHelp } from './help';
@@ -88,7 +87,7 @@ export class RootParser<T> {
     private readonly output: (line: string) => void,
     private readonly exit: (code: number) => void
   ) {
-    this.argGroup = mergeArgumentParsers(
+    this.argGroup = mergeArgumentParserGroups(
       {[help]: this.options.helpFlag},
       argGroup
     );
@@ -113,7 +112,7 @@ export class RootParser<T> {
 
     const { tokens } = tokeniseResult;
 
-    const parseResult = parse(tokens, this.argGroup);
+    const parseResult = parseArgumentGroup(tokens, this.argGroup);
 
     if (!parseResult.success) {
       this.output(parseResult.message);
@@ -257,14 +256,14 @@ export class Subcommand<T,U> {
     argGroup: ArgumentParserGroup<U,any>,
     private readonly parserOptions: ParserOptions
   ) {
-    this.argGroup = mergeArgumentParsers(
+    this.argGroup = mergeArgumentParserGroups(
       {[help]: this.parserOptions.helpFlag},
       argGroup
     );
   }
 
   execute(args: T, tokens: Token[]): void {
-    const parseResult = parse(
+    const parseResult = parseArgumentGroup(
       tokens,
       this.argGroup
     );

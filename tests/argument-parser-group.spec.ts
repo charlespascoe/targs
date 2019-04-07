@@ -1,6 +1,6 @@
-import { initState, coerceState, parseArgumentGroup, parse } from '../lib/group-parsing';
+import { ArgumentParserGroup, initState, coerceState, parseFinalState, parseArgumentGroup } from '../lib/argument-parser-group';
 import { success, error } from '../lib/result';
-import { ArgumentParser, ArgumentParserGroup, TokenParser, completionResult } from '../lib/parsers/argument-parser';
+import { ArgumentParser, TokenParser, completionResult } from '../lib/parsers/argument-parser';
 import { expect } from 'chai';
 import 'mocha';
 
@@ -100,7 +100,7 @@ describe('parser', () => {
 
   });
 
-  describe('parseArgumentGroup', () => {
+  describe('parseFinalState', () => {
 
     it('should return the given state if no tokens are provided', () => {
       const fooArgParser: ArgumentParser<number,number> = dummyArgumentParser({
@@ -109,7 +109,7 @@ describe('parser', () => {
         coerce: (x: number) => success(x)
       });
 
-      const result = parseArgumentGroup({foo: 456}, [], {foo: fooArgParser});
+      const result = parseFinalState({foo: 456}, [], {foo: fooArgParser});
 
       expect(result).to.deep.equal({
         finalState: {
@@ -126,7 +126,7 @@ describe('parser', () => {
         coerce: (x: number) => success(x)
       });
 
-      const result = parseArgumentGroup({foo: 456}, [{type: 'short', value: 'x'}], {foo: fooArgParser});
+      const result = parseFinalState({foo: 456}, [{type: 'short', value: 'x'}], {foo: fooArgParser});
 
       expect(result).to.deep.equal({
         finalState: {
@@ -148,7 +148,7 @@ describe('parser', () => {
         coerce: (x: number) => success(x)
       });
 
-      const result = parseArgumentGroup({foo: 456}, [{type: 'short', value: 'x'}], {foo: fooArgParser});
+      const result = parseFinalState({foo: 456}, [{type: 'short', value: 'x'}], {foo: fooArgParser});
 
       expect(result).to.deep.equal({
         finalState: {
@@ -160,7 +160,7 @@ describe('parser', () => {
 
   });
 
-  describe('parse', () => {
+  describe('parseArgumentGroup', () => {
 
     it('should return the first state coercion error', () => {
       const fooArgParser: ArgumentParser<number,number> = dummyArgumentParser({
@@ -169,7 +169,7 @@ describe('parser', () => {
         coerce: (x: number) => error('Foo invalid')
       });
 
-      const result = parse([], {foo: fooArgParser});
+      const result = parseArgumentGroup([], {foo: fooArgParser});
 
       expect(result).to.deep.equal({
         success: false,
@@ -184,7 +184,7 @@ describe('parser', () => {
         coerce: (x: number) => success(x + 1)
       });
 
-      const result = parse([{type: 'short', value: 'x'}], {foo: fooArgParser});
+      const result = parseArgumentGroup([{type: 'short', value: 'x'}], {foo: fooArgParser});
 
       expect(result).to.deep.equal({
         success: true,
